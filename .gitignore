@@ -1,0 +1,14 @@
+# Obsidian workspace & cache (mỗi người dùng có layout riêng)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*~
+
+# Scratch / Temp files
+*.tmp
+*.bak

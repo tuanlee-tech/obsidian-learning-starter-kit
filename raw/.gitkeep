@@ -1,0 +1,2 @@
+# Raw Exports Directory
+Thư mục này dùng để lưu các file Markdown xuất ra từ lệnh `/export` trên NotebookLM trước khi nhờ AI Agent chạy `/ingest` vào `wiki/`.
