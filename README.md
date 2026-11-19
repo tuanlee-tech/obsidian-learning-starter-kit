@@ -60,7 +60,7 @@ Gõ lần lượt 5 lệnh ngắn gọn sau vào khung chat NotebookLM:
 | Thứ tự | Lệnh | Gia sư NotebookLM sẽ làm gì cho bạn? |
 |---|---|---|
 | **1** | `/outline` | Quét tài liệu nguồn, lọc ra **4–6 mục cốt lõi nhất** phù hợp với trình độ hiện tại. Các phần quá sâu/hàn lâm sẽ được tách riêng vào **`🎒 Deep-Dive Backlog`** để bạn không bị ngợp. |
-| **2** | `/teach` | Giảng từng mục một (`1.1 → 1.2...`) theo 4 bước: **Định nghĩa bình dân ➔ Ẩn dụ đời thường ➔ Quy trình/Cơ chế & Ví dụ thực tế (Case study/Tình huống) ➔ 1 câu hỏi gợi mở nhẹ nhàng**. Chờ bạn trả lời xong mới qua mục tiếp theo! *(Sơ đồ được vẽ dạng dọc tối ưu để bạn đọc thoải mái ngay cả trên điện thoại).* |
+| **2** | `/teach` | Giảng từng mục một (`1.1 → 1.2...`) theo 4 bước: **Định nghĩa bình dân ➔ Ẩn dụ đời thường ➔ Quy trình/Cơ chế & Ví dụ thực tế (Case study/Tình huống) ➔ 1 câu hỏi gợi mở nhẹ nhàng**. Khi bạn trả lời đúng, gia sư sẽ hỏi xem bạn còn thắc mắc gì ở mục đó không; khi bạn xác nhận không còn câu hỏi thì mới qua mục tiếp theo! *(Sơ đồ được vẽ dạng dọc tối ưu để bạn đọc thoải mái ngay cả trên điện thoại).* |
 | **3** | `/flash-1` | Tạo bộ câu hỏi ôn tập **Flashcards Cấp 1** từ chính những gì bạn vừa học trong `/teach`. |
 | **4** | `/flash-2` | Quét tài liệu nguồn tìm **3–5 mảnh ghép thực tế còn sót**, giảng nhanh qua **`📖 Mini-Lesson (1 phút)`** rồi mới tạo **`🃏 Flashcard Q&A Cấp 2`** (cam kết *Giảng trước — Hỏi sau*, không bao giờ hỏi đánh đố những gì chưa dạy). |
 | **5** | `/export` | Đóng gói toàn bộ buổi học (hợp nhất lý thuyết `/teach` + `Mini-Lesson` của `/flash-2` + Bộ Flashcards Tổng hợp + Backlog) thành một file Markdown chuẩn chỉnh. |

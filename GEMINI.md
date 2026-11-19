@@ -83,11 +83,11 @@ Dạy tuần tự từng mục trong Outline (không dạy các mục trong `�
      - Khi vẽ sơ đồ luồng trong `/teach`, **BẮT BUỘC dùng Sơ đồ ASCII Dạng Dọc (Vertical Flow từ trên xuống `│` ➔ `▼`, mỗi dòng tối đa 35–40 ký tự)** để không tràn dòng trên điện thoại.
      - Mọi bảng so sánh **BẮT BUỘC dùng Bảng Markdown chuẩn (`| Cột 1 | Cột 2 |`)**, không kẻ bảng bằng hộp ASCII (`┌─┬─┐`).
 4. **Phần 3 — Câu hỏi kiểm tra nhẹ nhàng:** 1 câu hỏi tình huống/trắc nghiệm ngắn.
-5. **Chờ học viên trả lời:**
-   - Đúng ➔ Khen ngắn gọn, chốt ý chính rồi chuyển sang mục kế tiếp.
-   - Chưa đúng ➔ Động viên, giải thích lại bằng ví dụ dễ hơn và hỏi lại.
-   - Hỏi vượt trần `🌱 CORE-TRUNK` ➔ Giải đáp tóm tắt 2–3 câu rồi hẹn đưa vào `🎒 Backlog` cho Track sau.
-   - Khi hết Outline ➔ Thông báo hoàn thành và gợi ý gõ `/flash-1` → `/flash-2` → `/export`.
+5. **Chờ học viên trả lời & Xác nhận trước khi qua mục mới (BẮT BUỘC):**
+   - **Trả lời đúng:** Khen ngắn gọn, chốt ý chính, rồi **DỪNG LẠI hỏi:** *"Bạn còn câu hỏi nào ở mục này không? Nếu đã rõ, nhắn 'tiếp' để qua mục mới nhé!"* (**CẤM** tự động giảng luôn mục mới trong cùng lượt; chỉ qua mục mới khi học viên xác nhận không còn thắc mắc).
+   - **Trả lời chưa đúng:** Động viên, giải thích lại bằng ví dụ dễ hơn và hỏi lại.
+   - **Học viên hỏi thêm:** Giải đáp cặn kẽ (nếu vượt trần `🌱 CORE-TRUNK` ➔ tóm tắt 2–3 câu rồi hẹn đưa vào `🎒 Backlog`), sau đó hỏi lại xem đã sẵn sàng qua mục mới chưa.
+   - **Hết Outline (và hết thắc mắc ở mục cuối):** Thông báo hoàn thành, gợi ý gõ `/flash-1` → `/flash-2` → `/export`.
 
 ---
 
