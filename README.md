@@ -46,8 +46,8 @@ Repo đã đóng gói sẵn **Workspace Plugin** tại [`.agents/plugins/noteboo
    ```
    Skill **`study-init`** sẽ tự động:
    - **Chạy Health Check toàn diện** (`uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor`, ping sống MCP `server_info` + `notebook_list`, kiểm tra ngân sách ký tự `docs/notebooklm-system-prompt.md ≤ 8.350` ký tự).
-   - **Phỏng vấn 4 câu ngắn gọn** (Lĩnh vực & Mục tiêu, Trình độ & Quỹ thời gian, Nguồn tài liệu có sẵn hay nhờ gợi ý, Tên 3 tầng độ sâu & Dạng ví dụ thực tế).
-   - **Tự thiết lập toàn bộ vault:** cập nhật [`CLAUDE.md`](CLAUDE.md), cá nhân hóa [`docs/notebooklm-system-prompt.md`](docs/notebooklm-system-prompt.md), dựng [`docs/roadmap.md`](docs/roadmap.md), khởi tạo [`wiki/00-master-hub.md`](wiki/00-master-hub.md) và tạo sẵn **Lịch học Tuần 1 (5 ngày)**.
+   - **Phỏng vấn thích ứng 2–3 lượt ngắn (5–8 câu tùy nhánh)** để định chuẩn phạm vi theo **4 chế độ Ground-Truth Anchor** (tự cung cấp JD/Đề cương/Spec, Agent Deep Search thực tế, Kết hợp Hybrid, hoặc Tự suy luận; hỗ trợ sinh sẵn Prompt Deep Research nếu muốn quét 50+ JD) + lọc kiến thức ĐÃ vững để không học lại.
+   - **Trình bày Blueprint để bạn duyệt trước khi ghi file**, sau đó tự động dựng trọn bộ vault: `docs/scope-benchmark.md` (khi có JD/Syllabus/Deep Search), cập nhật [`CLAUDE.md`](CLAUDE.md), cá nhân hóa [`docs/notebooklm-system-prompt.md`](docs/notebooklm-system-prompt.md), dựng [`docs/roadmap.md`](docs/roadmap.md), khởi tạo [`wiki/00-master-hub.md`](wiki/00-master-hub.md) và tạo sẵn **Lịch học Tuần 1 (5 ngày)**.
 
 ---
 
@@ -133,7 +133,7 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 │   ├── rules/AGENTS.md                ← Luật điều hướng /init, đa nguồn & active notebook
 │   ├── scripts/study_helper.py        ← Helper Python stdlib (health check, parser 4 loại nguồn, đếm ký tự)
 │   └── skills/
-│       ├── study-init/                ← Skill 0: Health Check MCP/NotebookLM & /init 4 câu
+│       ├── study-init/                ← Skill 0: Health Check MCP/NotebookLM, /init thích ứng (JD/Syllabus/Deep Search + Duyệt Blueprint) & Re-Benchmark
 │       ├── weekly-study-plan/         ← Skill 1: Tạo lịch học tuần (5 ngày)
 │       ├── study-day-init/            ← Skill 2: Tạo notebook đa nguồn + Configure Chat + chạy /outline
 │       └── study-session-and-sync/    ← Skill 3: Học /teach qua MCP, lệnh "kết bài" & "đồng bộ"
@@ -142,6 +142,7 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 │
 ├── docs/                              ← Quản lý Kế hoạch, System Prompt & Lịch học theo Thời gian
 │   ├── roadmap.md                     ← Bản đồ tổng thể (Được tạo tự động khi chạy /init)
+│   ├── scope-benchmark.md             ← Hồ sơ phân tích JD / Đề cương chuẩn (tự tạo khi chọn Chế độ 1–3)
 │   ├── notebooklm-system-prompt.md    ← System Prompt mẫu cho NotebookLM (≤ 8.350 ký tự)
 │   ├── template-lich-hoc.md           ← Khuôn mẫu thiết kế buổi học đa nguồn & Lesson Scope
 │   └── lich-hoc-tuan-1.md             ← Lịch học chi tiết 5 ngày (tạo tự động sau /init)
@@ -171,7 +172,7 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 
 | # | Tên Skill | File cấu hình | Cách gọi ngắn | Tự động thực hiện |
 |---|---|---|---|---|
-| **0** | **`study-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-init/SKILL.md) | `"/init"`, `"kiểm tra kết nối"`, `"health check"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng (`uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor`, ping sống `server_info` + `notebook_list`, kiểm tra độ dài prompt `≤ 8.350` chars); nếu vault ở trạng thái Clean Slate thì phỏng vấn 4 câu dựng toàn bộ Roadmap, Hub và Tuần 1. |
+| **0** | **`study-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-init/SKILL.md) | `"/init"`, `"kiểm tra kết nối"`, `"cập nhật roadmap theo JD mới"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng (`uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor`, ping sống `server_info` + `notebook_list`, kiểm tra độ dài prompt `≤ 8.350` chars); nếu vault Clean Slate thì phỏng vấn thích ứng 2–3 lượt, neo phạm vi theo **JD thực tế / Đề cương / Deep Search (4 chế độ)**, chốt duyệt Blueprint rồi dựng toàn bộ Roadmap, Hub và Tuần 1; hỗ trợ Re-Benchmark không phá hủy trên vault đã khởi tạo. |
 | **1** | **`weekly-study-plan`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/weekly-study-plan/SKILL.md) | `"Tạo lịch học tuần X"` | Đọc `docs/roadmap.md`, quét bảng `backlog-*` trong `wiki/`, soạn lịch **5 ngày/tuần** (mỗi `Lesson Scope ≤ 1.400` chars) và xác minh toàn bộ nguồn (`url` `200 OK`, file trong `sources/`, `drive`, `text`) qua `study_helper.py check-week`. |
 | **2** | **`study-day-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-day-init/SKILL.md) | `"Tạo bài W1D1"`, `"Tạo bài Track 1 W1D1"` | Kiểm tra nguồn hợp lệ → `notebook_create` → `source_add(wait=False)` cho đủ 4 loại nguồn (`url`/YouTube, `file` 43 định dạng, `drive`, `text`) → ghép `docs/notebooklm-system-prompt.md` + `Lesson Scope` vào `chat_configure` → **tự chạy `/outline`** → lưu trạng thái active notebook + in dàn bài & link. |
 | **3** | **`study-session-and-sync`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-session-and-sync/SKILL.md) | `"/teach"`, `"tiếp"`, `"kết bài"`, `"đồng bộ W1D1"` | Học tương tác `/teach`, trả lời câu hỏi, `/flash-1`, `/flash-2` trực tiếp trong Antigravity qua MCP (hiển thị nguyên văn, tự đồng bộ lên Web/Mobile); gõ **`kết bài`** tự chạy nối tiếp `/flash-1` → `/flash-2` → `/export` → `raw/` → `/pre-ingest` → `/ingest` (5-point sync) → `/lint`; gõ **`đồng bộ`** kéo `/export` từ buổi học trên Mobile/Web về Wiki. |
@@ -180,9 +181,9 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 
 | Pha công việc / Skill | Độ nặng thực tế | Model & Phiên bản khuyến nghị | Ghi chú |
 |---|---|---|---|
-| **Setup & Học `/teach` qua MCP**<br/>(`study-init`, `study-day-init`, `/teach`, `tiếp`, `/flash-1`, `/flash-2`) | **Nhẹ** (chủ yếu gọi MCP & in nguyên văn từ NotebookLM) | **`Gemini 3.8 Flash (Low / Medium)`** *(hoặc `Claude Sonnet 5.5 (Low)`)* | Phản hồi nhanh nhất cho 10–15 lượt `/teach`, tiết kiệm quota tối đa vì NotebookLM là bên giảng bài. |
+| **Setup & Học `/teach` qua MCP**<br/>(`study-init` Pha 1 Health Check, `study-day-init`, `/teach`, `tiếp`, `/flash-1`, `/flash-2`) | **Nhẹ** (chủ yếu gọi MCP & in nguyên văn từ NotebookLM) | **`Gemini 3.8 Flash (Low / Medium)`** *(hoặc `Claude Sonnet 5.5 (Low)`)* | Phản hồi nhanh nhất cho 10–15 lượt `/teach`, tiết kiệm quota tối đa vì NotebookLM là bên giảng bài. |
 | **Chốt bài & Ingest Wiki 5 điểm**<br/>(`"kết bài"`, `"đồng bộ"`, `/pre-ingest` → `/ingest` → `/lint`) | **Trung bình – Cao** (kiểm chứng nguồn, Auto-Enrich 4 bước, đồng bộ 5–8 file) | **`Claude Sonnet 5.5 (Medium / High)`**, **`Gemini 4 Argon (Medium / High)`** hoặc **`Gemini 4 Neon (Medium / High)`** | Tuân thủ chặt `CLAUDE.md`; nên chạy `/compact` trước nếu phiên `/teach` đã kéo dài nhiều lượt. |
-| **Khởi tạo `/init`, Lập lịch tuần & Kiến trúc**<br/>(`study-init` Clean Slate, `weekly-study-plan`, thiết kế `roadmap.md`) | **Cao** (thiết kế lộ trình đa tầng, quét chéo `backlog-*`, chọn nguồn chuẩn) | **`Claude Sonnet 5.5 (High)`** hoặc **`Gemini 4 Neon (High)`** *(chỉ cần `Claude Opus 5.5 (High)` / `Gemini 4 Neon (XHigh)` khi refactor lớn)* | Đảm bảo độ bao phủ kiến thức và cân đối độ sâu `CORE-TRUNK` vs `TRACK-DEEP-DIVE`. |
+| **Khởi tạo `/init` (JD/Blueprint), Lập lịch tuần & Kiến trúc**<br/>(`study-init` Pha 2–3, `weekly-study-plan`, thiết kế `roadmap.md`) | **Cao** (phân tích JD/Deep Search, thiết kế lộ trình đa tầng, quét chéo `backlog-*`) | **`Claude Sonnet 5.5 (High)`** hoặc **`Gemini 4 Neon (High)`** *(chỉ cần `Claude Opus 5.5 (High)` / `Gemini 4 Neon (XHigh)` khi refactor lớn)* | Đảm bảo độ sắc bén khi lọc phạm vi theo thị trường và cân đối độ sâu `CORE-TRUNK` vs `TRACK-DEEP-DIVE`. |
 
 > **Mẹo dùng 1 model duy nhất (không cần đổi qua lại):** Chọn **`Claude Sonnet 5.5 (Medium)`** hoặc **`Gemini 4 Argon (Medium)`** / **`Gemini 4 Neon (Medium)`** — đủ nhanh cho `/teach` và đủ chuẩn cho toàn bộ chuỗi `/ingest` Wiki. Agent cũng sẽ tự gợi ý ngắn 1 dòng ở các điểm chuyển pha quan trọng.
 
@@ -192,7 +193,8 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 
 | Lệnh / Yêu cầu | Chức năng |
 |---|---|
-| `/init` hoặc `"Kiểm tra kết nối"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng; nếu vault đang sạch thì phỏng vấn 4 câu dựng toàn bộ Roadmap, Hub và Tuần 1. |
+| `/init` hoặc `"Kiểm tra kết nối"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng; nếu vault đang sạch thì phỏng vấn thích ứng 2–3 lượt, neo chuẩn theo **JD / Đề cương / Deep Search (4 chế độ)**, trình bày Blueprint duyệt rồi dựng toàn bộ Roadmap, Hub và Tuần 1. |
+| `"Cập nhật Roadmap theo JD mới"` | Chạy **Re-Benchmark không phá hủy** trên vault đã khởi tạo (đối chiếu JD/chuẩn mới, trình bày Diff đề xuất để duyệt — không xóa `wiki/` đã học). |
 | `"Tạo lịch học tuần X"` | Quét `docs/roadmap.md` & `backlog-*` trong `wiki/` để soạn lịch 5 ngày kèm kiểm chứng đa nguồn. |
 | `"Tạo bài W1D1"` | Tự động tạo notebook, nạp đủ nguồn (`url`/`file`/`drive`/`text`), ghép `Configure Chat` và chạy sẵn `/outline`. |
 | `/teach` ➔ trả lời ➔ `tiếp` | Học tương tác trực tiếp trong Antigravity qua MCP (tự đồng bộ lên lịch sử NotebookLM Web/Mobile). |

@@ -4,41 +4,59 @@
 
 ---
 
-## 0. Quy trình Khởi tạo Lĩnh vực Mới & Health Check MCP (`/init`)
+## 0. Quy trình Khởi tạo Lĩnh vực Mới, Health Check MCP & Re-Benchmark (`/init`)
 
-Nếu trường `Trạng thái khởi tạo` ở Mục 2 đang là `CHƯA KHỞI TẠO (CLEAN SLATE)` hoặc khi người dùng gõ `/init`, Agent **bắt buộc kích hoạt Skill `study-init`** để chạy trọn gói 2 pha:
+Nếu trường `Trạng thái khởi tạo` ở Mục 2 đang là `CHƯA KHỞI TẠO (CLEAN SLATE)` hoặc khi người dùng gõ `/init`, `"kiểm tra kết nối"`, hoặc `"cập nhật roadmap theo JD mới"`, Agent **bắt buộc kích hoạt Skill `study-init`** để chạy trọn gói:
 
-### Bước 0: Kiểm tra Sức khỏe Môi trường & Kết nối NotebookLM MCP (Health Check)
+### Pha 1: Kiểm tra Sức khỏe Môi trường & Kết nối NotebookLM MCP (Luôn chạy trước)
 - Chạy `python .agents/plugins/notebooklm-study/scripts/study_helper.py check-env --live` (hoặc `python3` trên macOS/Linux) để kiểm tra `uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, trạng thái đăng nhập (`nlm doctor`) và ngân sách ký tự `docs/notebooklm-system-prompt.md` (`≤ 8.350` ký tự).
 - Gọi ping sống MCP (`server_info` + `notebook_list`) để xác nhận Antigravity đã kết nối mượt với NotebookLM; nếu thiếu `uv` hoặc chưa đăng nhập thì hướng dẫn/chạy ngay lệnh cài & `nlm login` 1 bước theo đúng OS.
+- Nếu vault **đã khởi tạo** (`ĐÃ KHỞI TẠO`), mặc định **dừng an toàn sau Pha 1** (không ghi đè dữ liệu đang học); chỉ chuyển sang **Pha 3 (Re-Benchmark không phá hủy)** khi người dùng yêu cầu đích danh *"Cập nhật Roadmap theo JD mới"*.
 
-### Bước 1: Phỏng vấn 4 câu hỏi (Chỉ chạy khi vault ở trạng thái `CLEAN SLATE`)
-1. **Lĩnh vực & Mục tiêu đầu ra:** Bạn muốn học lĩnh vực/chuyên ngành gì (ví dụ: Tài chính Đầu tư, Y khoa/Dược, Luật, Marketing, Thiết kế UI/UX, Ngoại ngữ, Lập trình...)? Mục tiêu cụ thể là gì (học bài bản từ con số 0, ôn thi chứng chỉ, hay phục vụ dự án thực tế)?
-2. **Trình độ hiện tại & Quỹ thời gian:** Bạn đang ở mức nào trong lĩnh vực này và có thể dành bao nhiêu giờ/ngày (hoặc bao nhiêu buổi/tuần) để học?
-3. **Nguồn tài liệu học tập:** Bạn **đã có sẵn tài liệu** (Sách PDF/DOCX/Slide/Audio thả vào `sources/`, link Google Drive, YouTube, hoặc danh sách link web) muốn bám theo, hay muốn **Agent tự thiết kế lộ trình từ A–Z kèm gợi ý nguồn tài liệu chuẩn quốc tế/trong nước**?
-4. **Phong cách Thực hành & Tên gọi 3 tầng độ sâu:**
-   - Gợi ý cách đặt tên 3 tầng độ sâu (`🌱 Foundation` ➔ `💡 Practical` ➔ `👑 Expert`) theo đúng ngôn ngữ chuyên ngành của họ (ví dụ:
+### Pha 2: Khởi tạo Vault Mới — Phỏng vấn Thích ứng & Neo Chuẩn Thực tế (Chỉ chạy khi `CLEAN SLATE`)
+
+#### Bước 2A — Phỏng vấn thích ứng 2–3 lượt ngắn (5–8 câu tùy nhánh)
+- **Lượt 1 — Định hướng & Chế độ Chuẩn đầu ra (Ground-Truth Anchor):**
+  1. **Lĩnh vực & Mục tiêu chính:** Học theo *Nghề nghiệp/Chuyển việc* (bám JD), *Ôn thi chứng chỉ* (bám Exam Blueprint/Syllabus), hay *Học thuật/Giáo trình/Dự án* (bám Mục lục giáo trình / Spec dự án)?
+  2. **Chọn 1 trong 4 chế độ định chuẩn phạm vi (Ground-Truth Mode):**
+     - **Chế độ 1 — Người dùng cung cấp:** Dán trực tiếp JD/Syllabus/Spec, gửi URL, hoặc thả file vào `sources/`.
+     - **Chế độ 2 — Agent tự Deep Search thực tế:** Agent chạy web search đa truy vấn lấy JD tuyển dụng / đề cương chính thức mới nhất theo đúng thị trường & cấp bậc.
+     - **Chế độ 3 — Kết hợp / Hybrid *(Khuyến nghị cho Nghề nghiệp)*:** Người dùng đưa 1–N JD mẫu + Agent search mở rộng thêm 10–15 JD cùng thị trường để tránh lệch 1 công ty.
+     - **Chế độ 4 — Bỏ qua, Agent tự suy luận:** Thiết kế nhanh từ tri thức chuẩn của ngành.
+     *(Riêng Chế độ 2 & 3: nếu môi trường không có web search hoặc người dùng muốn quét sâu 50+ JD bằng Gemini/ChatGPT/Perplexity Deep Research, Agent sinh sẵn **Prompt Deep Research chuẩn hóa** để người dùng chạy rồi nạp kết quả lại).*
+- **Lượt 2 — Rẽ nhánh chuyên sâu + Nền tảng hiện có & Quỹ thời gian:**
+  - *Nhánh Nghề nghiệp/JD:* Vị trí đích, cấp bậc hiện tại ➔ đích, thị trường mục tiêu (VN / APAC / Global Remote / Big Tech...) + nhận JD nếu chọn Chế độ 1/3.
+  - *Nhánh Chứng chỉ / Học thuật / Dự án:* Tên kỳ thi/phiên bản hoặc giáo trình/sản phẩm đích, thời hạn + nhận đề cương/spec nếu chọn Chế độ 1/3.
+  - *Chung mọi nhánh:* **Nền tảng ĐÃ vững** (để rút gọn hoặc bỏ qua, không học lại từ đầu) + **Quỹ thời gian/tuần**.
+- **Lượt 3 — Nguồn tài liệu & Phong cách học (Xác nhận nhanh):**
+  1. **Nguồn tài liệu học tập:** Đã có sẵn tài liệu (`sources/`, Google Drive, YouTube, URL) hay muốn Agent tuyển chọn nguồn chuẩn quốc tế/trong nước?
+  2. **Tên gọi 3 tầng độ sâu (`🌱 / 💡 / 👑`) & Dạng ví dụ thực hành:** Agent đề xuất sẵn theo đúng ngôn ngữ ngành để người dùng chốt nhanh:
      - *Y Dược:* `🌱 Cơ chế Sinh lý/Bệnh sinh` ➔ `💡 Thực hành Lâm sàng & Phác đồ` ➔ `👑 Chuyên khoa Sâu & Ca bệnh Phức tạp`
      - *Kinh tế/Kinh doanh:* `🌱 Nguyên lý & Khái niệm` ➔ `💡 Case Study & Vận dụng Thực tế` ➔ `👑 Chiến lược Vĩ mô & Đánh đổi Quản trị`
      - *Luật/Pháp lý:* `🌱 Lý luận & Quy định Pháp luật` ➔ `💡 Áp dụng Tình huống & Án lệ` ➔ `👑 Phân tích Lập pháp & Tranh tụng Phức tạp`
      - *Kỹ thuật/IT:* `🌱 Mental Model (Junior)` ➔ `💡 Practical Usage (Mid/Senior)` ➔ `👑 Architecture & Internals (Staff)`
-     - *Ngoại ngữ/Kỹ năng:* `🌱 Quy tắc & Ngữ nghĩa Cốt lõi` ➔ `💡 Giao tiếp & Phản xạ Tình huống` ➔ `👑 Sắc thái Bản xứ & Học thuật Chuyên sâu`)
-   - Hỏi hình thức ví dụ minh họa họ muốn xuất hiện trong mỗi bài học (Case study thực tế, Tình huống xử lý, Bài tập tính toán, Đoạn hội thoại mẫu, hay Code...).
+     - *Ngoại ngữ/Kỹ năng:* `🌱 Quy tắc & Ngữ nghĩa Cốt lõi` ➔ `💡 Giao tiếp & Phản xạ Tình huống` ➔ `👑 Sắc thái Bản xứ & Học thuật Chuyên sâu`
 
-### Bước 2: Tự động Thiết lập Toàn bộ Hệ thống sau khi người dùng trả lời
-Ngay sau khi nhận câu trả lời, Agent tự động thực hiện trọn gói:
-1. **Cập nhật `CLAUDE.md` (Mục 2):** Điền `Lĩnh vực`, `Mục tiêu`, `3 tầng độ sâu chuyên ngành`, `Phong cách ví dụ thực hành` và đổi trạng thái sang `ĐÃ KHỞI TẠO`.
-2. **Cá nhân hóa `docs/notebooklm-system-prompt.md`:** Cập nhật vai trò Mentor, tên 3 tầng độ sâu (`🌱 / 💡 / 👑`) cùng loại ví dụ minh họa cho khớp chuyên ngành, **xác minh phần từ `# SYSTEM INSTRUCTION` trở xuống luôn $\le 8.350$ ký tự** bằng `study_helper.py check-prompt`.
-3. **Thiết kế `docs/roadmap.md`:** Xây dựng lộ trình học tập toàn diện chia làm 2 giai đoạn:
+#### Bước 2B — Cổng duyệt Blueprint Bắt buộc (Approval Gate)
+Sau khi phân tích JD / Chuẩn đầu ra (hoặc tổng hợp giả định ở Chế độ 4), Agent **dừng lại trình bày Bản phác thảo Scope (Blueprint)** gồm: Top kỹ năng Must-have kèm trọng số (`JD %` / ưu tiên), phân tách `🌱 CORE-TRUNK` vs `🚀 TRACK-DEEP-DIVE` vs `⏭️ Đã vững / Rút gọn`, tên 3 tầng độ sâu và trọng tâm Tuần 1. **Chỉ ghi file khi người dùng gõ `"Duyệt"`** (hoặc sau khi chỉnh theo góp ý).
+
+#### Bước 2C — Tự động Dựng Toàn bộ Hệ thống sau khi Người dùng Duyệt
+1. **Lưu Hồ sơ Chuẩn đầu ra có điều kiện (`docs/scope-benchmark.md`):** Nếu dùng Chế độ 1–3, lưu danh sách JD/đề cương đã quét, bảng tần suất `Must-have` vs `Nice-to-have` và phân tích khoảng trống (Gap Analysis) vào `docs/scope-benchmark.md` và liên kết ở đầu `docs/roadmap.md`. Nếu dùng Chế độ 4, chỉ ghi tóm tắt giả định phạm vi ngay đầu `docs/roadmap.md`.
+2. **Cập nhật `CLAUDE.md` (Mục 2):** Điền `Lĩnh vực`, `Mục tiêu`, `Chế độ chuẩn đầu ra`, `3 tầng độ sâu chuyên ngành`, `Phong cách ví dụ thực hành` và đổi trạng thái sang `ĐÃ KHỞI TẠO`.
+3. **Cá nhân hóa `docs/notebooklm-system-prompt.md`:** Cập nhật vai trò Mentor, tên 3 tầng độ sâu (`🌱 / 💡 / 👑`) cùng loại ví dụ minh họa cho khớp chuyên ngành, **xác minh phần từ `# SYSTEM INSTRUCTION` trở xuống luôn $\le 8.350$ ký tự** bằng `study_helper.py check-prompt`.
+4. **Thiết kế `docs/roadmap.md`:** Xây dựng lộ trình học tập toàn diện chia làm 2 giai đoạn:
    - **Giai đoạn 1 — `🌱 CORE-TRUNK` (Nền tảng Cốt lõi):** Từ 3–6 học phần (Modules/Skills) gốc quan trọng nhất giúp nắm vững 80% bản chất và ứng dụng thực tế trong thời gian ngắn.
    - **Giai đoạn 2 — `🚀 TRACK-DEEP-DIVE` (Các Chuyên đề Chuyên sâu Track 1 → Track N):** Các nhánh chuyên môn sâu để nâng tầm lên mức Chuyên gia (`👑 Expert`).
-4. **Khởi tạo Cấu trúc `wiki/` 4 Tầng:**
+5. **Khởi tạo Cấu trúc `wiki/` 4 Tầng:**
    - Cập nhật `wiki/00-master-hub.md` khớp với `docs/roadmap.md`.
    - Tạo `wiki/00-core-trunk/00-hub-core-trunk.md` và các thư mục học phần con kèm trang `00-index-<hoc-phan>.md` (gồm Bảng Danh mục trống + Full Lộ trình Kiến thức của học phần đó).
-5. **Tạo ngay Lịch học Tuần 1 (`docs/lich-hoc-tuan-1.md`, 5 ngày):**
+6. **Tạo ngay Lịch học Tuần 1 (`docs/lich-hoc-tuan-1.md`, 5 ngày):**
    - Thiết kế chi tiết từng buổi học của Tuần 1 theo đúng khuôn mẫu `docs/template-lich-hoc.md` (kích hoạt `weekly-study-plan`).
    - Mỗi buổi có sẵn khối **`Lesson Scope` ($\le 1.400$ ký tự)** và danh sách **Nguồn tài liệu** (hỗ trợ đủ 4 loại: `url`/YouTube, file trong `sources/`, Google Drive, Text); chạy `study_helper.py check-week docs/lich-hoc-tuan-1.md` xác minh toàn bộ nguồn hợp lệ.
-6. **Bắt đầu học ngay trong Antigravity:** Gợi ý người dùng nhắn *"Tạo bài W1D1"* để khởi tạo notebook đầu tiên + chạy sẵn `/outline` hoàn toàn tự động qua MCP.
+7. **Bắt đầu học ngay trong Antigravity:** Gợi ý người dùng nhắn *"Tạo bài W1D1"* để khởi tạo notebook đầu tiên + chạy sẵn `/outline` hoàn toàn tự động qua MCP.
+
+### Pha 3: Re-Benchmark Không Phá Hủy (Khi Vault Đã Khởi Tạo & Người Dùng Yêu Cầu)
+Khi người dùng nhắn *"Cập nhật Roadmap theo JD mới"* trên vault đã khởi tạo, Agent chạy lại bước phân tích chuẩn đầu ra (Chế độ 1–3), đối chiếu với `docs/roadmap.md` và tiến độ `wiki/` hiện tại, trình bày **Diff đề xuất** để người dùng duyệt trước khi cập nhật `docs/scope-benchmark.md`, `docs/roadmap.md` & các trang mục lục (**tuyệt đối không xóa bất kỳ trang `wiki/` nào đã học**).
 
 ---
 
@@ -58,6 +76,7 @@ Wiki là **tài sản tri thức tích lũy**: kiến thức được biên so�
 - **Trạng thái khởi tạo:** `CHƯA KHỞI TẠO (CLEAN SLATE)` *(Gõ `/init` để thiết lập lĩnh vực học của bạn)*
 - **Ngôn ngữ:** Tiếng Việt. Giữ nguyên thuật ngữ chuyên ngành quốc tế kèm giải nghĩa khi cần.
 - **Lĩnh vực (`domain`):** `[chưa-thiết-lập]`
+- **Chuẩn đầu ra (`scope_anchor`):** `[chưa-thiết-lập]` *(JD thực tế / Exam Blueprint / Syllabus / Tự suy luận — tự điền khi chạy `/init`)*
 - **Giai đoạn / Chuyên đề hiện tại (`track`):** `00-core-trunk`
 - **Hệ quy chiếu 3 Tầng Độ sâu:**
   - Tầng 1 (`foundation`): `🌱 Foundation (Tư duy & Bản chất)`
@@ -77,7 +96,7 @@ Wiki là **tài sản tri thức tích lũy**: kiến thức được biên so�
 sources/       ← Tài liệu nguồn nội bộ (PDF/DOCX/PPTX/EPUB/Audio — gitignored) nạp trực tiếp vào NotebookLM qua MCP
 raw/           ← Bản gốc xuất từ NotebookLM (/export), tự kéo qua MCP, kiểm chứng, bồi đắp cơ chế & đồng bộ 2 chiều
 wiki/          ← Kho tri thức biên soạn theo cấu trúc 4 tầng (Agent đọc + ghi toàn quyền)
-docs/          ← Roadmap, System Prompt NotebookLM (`docs/notebooklm-system-prompt.md`), Lịch học theo tuần & Template
+docs/          ← Roadmap, Hồ sơ chuẩn đầu ra (`docs/scope-benchmark.md`, tạo khi dùng JD/Syllabus/Deep Search), System Prompt NotebookLM (`docs/notebooklm-system-prompt.md`), Lịch học theo tuần & Template
 CLAUDE.md      ← Schema & Hiến pháp của Vault (Cả hai, sửa khi đồng ý hoặc khi chạy /init)
 AGENTS.md      ← Liên kết điều hướng đến CLAUDE.md
 README.md      ← Hướng dẫn sử dụng cho người mới

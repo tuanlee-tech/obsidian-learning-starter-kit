@@ -1,7 +1,7 @@
 # 🗺️ Lộ trình Học tập Tổng thể (Master Roadmap)
 
 > **Trạng thái:** ⏳ *Chưa khởi tạo.*
-> Hãy mở khung chat với AI Agent và gõ **`/init`** (hoặc nói *"Tôi muốn bắt đầu học lĩnh vực..."*) để Agent phỏng vấn nhanh 4 câu và tự động thiết kế toàn bộ Lộ trình Học tập cá nhân hóa tại đây!
+> Hãy mở khung chat với AI Agent và gõ **`/init`** (hoặc nói *"Tôi muốn bắt đầu học lĩnh vực..."*) để Agent chạy phỏng vấn thích ứng (2–3 lượt), định chuẩn phạm vi theo **JD thực tế / Đề cương chứng chỉ / Giáo trình** (cung cấp sẵn, Deep Search hoặc kết hợp), trình bày **Blueprint để bạn duyệt**, rồi tự động thiết kế toàn bộ Lộ trình Học tập cá nhân hóa tại đây!
 
 ---
 
