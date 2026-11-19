@@ -12,3 +12,12 @@ Thumbs.db
 # Scratch / Temp files
 *.tmp
 *.bak
+
+# Ephemeral Antigravity NotebookLM active-session state & Python cache
+.agents/plugins/notebooklm-study/.state/
+__pycache__/
+*.py[cod]
+
+# Local study source files (PDF/DOCX/PPTX/audio — keep folder structure only)
+sources/*
+!sources/.gitkeep

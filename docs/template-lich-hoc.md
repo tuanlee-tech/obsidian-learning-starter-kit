@@ -1,9 +1,9 @@
-# Template Lịch học Tuần (Đa Lĩnh Vực)
+# Template Lịch học Tuần (Đa Lĩnh Vực & Đa Nguồn)
 
-> **Cách dùng:** Agent tạo file `lich-hoc-tuan-X.md` từ [`roadmap.md`](./roadmap.md), tuân thủ chế độ độ sâu (`🌱 CORE-TRUNK` cho giai đoạn nền tảng hoặc `🚀 TRACK-DEEP-DIVE` khi đi vào chuyên đề chuyên sâu).
-> **Nguyên tắc 1-Copy Block & Giới hạn Ký tự NotebookLM:**
-> - Toàn bộ **`Mode`**, **`✅ CHECKLIST HÔM NAY`** và **`🎒 DEEP-DIVE BACKLOG (Kèm Track đích)`** phải nằm trọn bên trong một block `Customize notebook` duy nhất.
-> - **Giới hạn cứng:** Mỗi block `Customize notebook` **BẮT BUỘC $\le 1.400$ ký tự** (vì ô Custom của NotebookLM giới hạn cứng **1.500 ký tự**), còn `GEMINI.md` (Configure Chat) **BẮT BUỘC $\le 9.000$ ký tự** (giới hạn cứng **10.000 ký tự**).
+> **Cách dùng:** Skill `weekly-study-plan` tạo file `lich-hoc-tuan-X.md` (5 ngày/tuần) từ [`roadmap.md`](./roadmap.md), tuân thủ chế độ độ sâu (`🌱 CORE-TRUNK` cho giai đoạn nền tảng hoặc `🚀 TRACK-DEEP-DIVE` khi đi vào chuyên đề chuyên sâu).
+> **Nguyên tắc Lesson Scope & Giới hạn Ký tự NotebookLM:**
+> - Toàn bộ **`Mode`**, **`✅ CHECKLIST HÔM NAY`** và **`🎒 DEEP-DIVE BACKLOG (Kèm Track đích)`** phải nằm trọn bên trong một block `Lesson Scope` duy nhất.
+> - **Giới hạn cứng:** Mỗi block `Lesson Scope` **BẮT BUỘC $\le 1.400$ ký tự** và [`docs/notebooklm-system-prompt.md`](./notebooklm-system-prompt.md) **BẮT BUỘC $\le 8.350$ ký tự**, để khi Antigravity tự động ghép cả hai vào **Configure Chat** (`chat_configure`) luôn nằm gọn dưới trần `10.000` ký tự của NotebookLM.
 
 ---
 
@@ -13,8 +13,8 @@
 |---|---|---|
 | **Trần độ sâu** | `🌱 Foundation` + `💡 Practical` (Nắm vững bản chất & vận dụng thực tế) | Mở khóa đủ 3 tầng `🌱 Foundation → 💡 Practical → 👑 Expert` |
 | **Mục tiêu** | Hiểu đúng nguyên lý cốt lõi để áp dụng ngay vào thực tế, tránh các lỗi phổ biến | Nắm vững cơ chế chuyên sâu, phân tích đa chiều, đánh đổi chiến lược & trả nợ Backlog |
-| **Nguồn tài liệu** | **2–4 nguồn chuẩn mực nhất** (Sách giáo trình chuẩn, Văn bản chính thống, Tài liệu gốc hoặc Bài giảng uy tín — KHÔNG nạp tràn lan gây nhiễu) | Giáo trình chuẩn + Bài báo nghiên cứu / Chuyên khảo + Case Study phức tạp + Deep Search |
-| **Kiến thức nâng cao** | Khai báo đầy đủ trong mục `🎒 DEEP-DIVE BACKLOG` ngay bên trong block `Customize notebook` để NotebookLM xuất ra ở cuối `/outline` và `/export` | Lôi các mục từ `🎒 Deep-Dive Backlog` của Core Trunk ra học gắn với bài toán thực tế |
+| **Nguồn tài liệu** | **2–4 nguồn chuẩn mực nhất** (URL chính thống, YouTube, file PDF/DOCX/PPTX/Audio trong `sources/`, Google Drive hoặc Text — KHÔNG nạp tràn lan gây nhiễu) | Giáo trình chuẩn + Bài báo nghiên cứu / Chuyên khảo + Case Study phức tạp + Deep Search |
+| **Kiến thức nâng cao** | Khai báo đầy đủ trong mục `🎒 DEEP-DIVE BACKLOG` ngay bên trong block `Lesson Scope` để NotebookLM xuất ra ở cuối `/outline` và `/export` | Lôi các mục từ `🎒 Deep-Dive Backlog` của Core Trunk ra học gắn với bài toán thực tế |
 
 ---
 
@@ -23,8 +23,8 @@
 ```markdown
 ## Ngày X — [Chủ đề Buổi học]
 
-### Customize notebook (Copy trọn 1 block này → ⚙️ → Customize notebook hoặc paste kèm `/outline`)
-\```
+### Lesson Scope (Tự động ghép vào Configure Chat qua Antigravity — `≤ 1.400 ký tự`)
+\```text
 Buổi học: Tuần X — Ngày Y — [Chủ đề]
 Học phần: [Tên học phần, ví dụ: Core Trunk #1 — ...]
 Mode: [🌱 CORE-TRUNK | 🚀 TRACK-DEEP-DIVE]
@@ -41,14 +41,14 @@ Nền tảng học viên: [Ghi chú trình độ hiện tại & loại ví dụ 
 - [Chủ đề chuyên sâu 2]: [Mô tả 1 câu vì sao hoãn lại] → Track đích: [Track Y — Tên chuyên đề]
 \```
 
-### Nguồn tài liệu (Nạp vào NotebookLM)
-- **Tài liệu 1:** [Tên Sách / Giáo trình PDF / Chương X] hoặc [Tên Tài liệu Chính thống](URL)
-- **Tài liệu 2:** [Tên Báo cáo / Bài viết chuẩn](URL)
-*(Ở chế độ 🌱 CORE-TRUNK: Chỉ nạp 2–4 nguồn cốt lõi trên để giữ độ tập trung cao nhất)*
+### Nguồn tài liệu (nạp vào NotebookLM — hỗ trợ đủ 4 loại nguồn)
+- [Tên tài liệu Web hoặc YouTube](https://example.com/official-guide)
+- [Giáo trình Chương 1 (PDF nội bộ trong sources/)](sources/giao-trinh-chuong-1.pdf)
+- [Slide bài giảng trên Google Drive](https://docs.google.com/presentation/d/<GOOGLE_DOC_ID>/edit)
+*(Hoặc dùng `#### 📝 Nguồn Text: <Tiêu đề>` kèm code block để nạp ghi chú văn bản trực tiếp. Ở chế độ 🌱 CORE-TRUNK: chỉ chọn 2–4 nguồn cốt lõi nhất.)*
 
 ### Quy trình học & Tiến độ
-- [ ] **Bước 1:** Tạo notebook mới trên NotebookLM → nạp các tài liệu ở mục *Nguồn tài liệu* làm Sources.
-- [ ] **Bước 2:** Copy trọn vẹn block **Customize notebook** bên trên → paste vào **⚙️ → Customize notebook** (hoặc paste trực tiếp kèm lệnh `/outline` ở tin nhắn đầu tiên).
-- [ ] **Bước 3:** Chạy tuần tự `/outline` → `/teach` → `/flash-1` → `/flash-2` → `/export`.
-- [ ] **Bước 4:** Lưu kết quả `/export` vào `raw/` và nhờ Agent ingest vào `wiki/<track>/<hoc-phan>/`.
+- [ ] **Bước 1:** Gọi Antigravity khởi tạo ngày học (*"Tạo bài W{X}D{Y}"*) → tự kiểm tra nguồn, tạo notebook, nạp đủ nguồn (`url`/`file`/`drive`/`text`), ghép `docs/notebooklm-system-prompt.md` + `Lesson Scope` vào `Configure Chat` và chạy sẵn `/outline`.
+- [ ] **Bước 2:** Học `/teach` → trả lời → `tiếp` ngay trên Antigravity (qua MCP) hoặc mở link NotebookLM Web/Mobile.
+- [ ] **Bước 3:** Nhắn `"kết bài"` (nếu học trên Antigravity) hoặc `"đồng bộ W{X}D{Y}"` (nếu học trên Mobile/Web) để tự chạy `/flash-1` → `/flash-2` → `/export` → lưu `raw/` → `/pre-ingest` → `/ingest` → `/lint`.
 ```

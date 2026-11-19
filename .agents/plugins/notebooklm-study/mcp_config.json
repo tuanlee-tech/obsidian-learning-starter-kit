@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "notebooklm": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "notebooklm-mcp-cli>=0.16.5",
+        "notebooklm-mcp"
+      ],
+      "env": {
+        "NOTEBOOKLM_QUERY_TIMEOUT": "180",
+        "NOTEBOOKLM_DISABLED_GROUPS": "studio,sharing,research,organization,automation,query_multi,usage"
+      }
+    }
+  }
+}

@@ -4,14 +4,18 @@
 
 ---
 
-## 0. Quy trình Khởi tạo Lĩnh vực Mới (`/init`)
+## 0. Quy trình Khởi tạo Lĩnh vực Mới & Health Check MCP (`/init`)
 
-Nếu trường `Trạng thái khởi tạo` ở Mục 2 đang là `CHƯA KHỞI TẠO (CLEAN SLATE)` hoặc khi người dùng gõ `/init`, Agent **bắt buộc thực hiện quy trình phỏng vấn 4 câu hỏi thông minh** để thiết lập hệ thống cá nhân hóa cho người dùng:
+Nếu trường `Trạng thái khởi tạo` ở Mục 2 đang là `CHƯA KHỞI TẠO (CLEAN SLATE)` hoặc khi người dùng gõ `/init`, Agent **bắt buộc kích hoạt Skill `study-init`** để chạy trọn gói 2 pha:
 
-### Bước 1: Phỏng vấn 4 câu hỏi (Có thể dùng công cụ hỏi trắc nghiệm hoặc hỏi trực tiếp ngắn gọn)
+### Bước 0: Kiểm tra Sức khỏe Môi trường & Kết nối NotebookLM MCP (Health Check)
+- Chạy `python .agents/plugins/notebooklm-study/scripts/study_helper.py check-env --live` (hoặc `python3` trên macOS/Linux) để kiểm tra `uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, trạng thái đăng nhập (`nlm doctor`) và ngân sách ký tự `docs/notebooklm-system-prompt.md` (`≤ 8.350` ký tự).
+- Gọi ping sống MCP (`server_info` + `notebook_list`) để xác nhận Antigravity đã kết nối mượt với NotebookLM; nếu thiếu `uv` hoặc chưa đăng nhập thì hướng dẫn/chạy ngay lệnh cài & `nlm login` 1 bước theo đúng OS.
+
+### Bước 1: Phỏng vấn 4 câu hỏi (Chỉ chạy khi vault ở trạng thái `CLEAN SLATE`)
 1. **Lĩnh vực & Mục tiêu đầu ra:** Bạn muốn học lĩnh vực/chuyên ngành gì (ví dụ: Tài chính Đầu tư, Y khoa/Dược, Luật, Marketing, Thiết kế UI/UX, Ngoại ngữ, Lập trình...)? Mục tiêu cụ thể là gì (học bài bản từ con số 0, ôn thi chứng chỉ, hay phục vụ dự án thực tế)?
 2. **Trình độ hiện tại & Quỹ thời gian:** Bạn đang ở mức nào trong lĩnh vực này và có thể dành bao nhiêu giờ/ngày (hoặc bao nhiêu buổi/tuần) để học?
-3. **Nguồn tài liệu học tập:** Bạn **đã có sẵn tài liệu** (Sách PDF, giáo trình, bộ slide, danh sách video/bài báo) muốn bám theo, hay muốn **Agent tự thiết kế lộ trình từ A–Z kèm gợi ý nguồn tài liệu chuẩn quốc tế/trong nước**?
+3. **Nguồn tài liệu học tập:** Bạn **đã có sẵn tài liệu** (Sách PDF/DOCX/Slide/Audio thả vào `sources/`, link Google Drive, YouTube, hoặc danh sách link web) muốn bám theo, hay muốn **Agent tự thiết kế lộ trình từ A–Z kèm gợi ý nguồn tài liệu chuẩn quốc tế/trong nước**?
 4. **Phong cách Thực hành & Tên gọi 3 tầng độ sâu:**
    - Gợi ý cách đặt tên 3 tầng độ sâu (`🌱 Foundation` ➔ `💡 Practical` ➔ `👑 Expert`) theo đúng ngôn ngữ chuyên ngành của họ (ví dụ:
      - *Y Dược:* `🌱 Cơ chế Sinh lý/Bệnh sinh` ➔ `💡 Thực hành Lâm sàng & Phác đồ` ➔ `👑 Chuyên khoa Sâu & Ca bệnh Phức tạp`
@@ -24,17 +28,17 @@ Nếu trường `Trạng thái khởi tạo` ở Mục 2 đang là `CHƯA KHỞI
 ### Bước 2: Tự động Thiết lập Toàn bộ Hệ thống sau khi người dùng trả lời
 Ngay sau khi nhận câu trả lời, Agent tự động thực hiện trọn gói:
 1. **Cập nhật `CLAUDE.md` (Mục 2):** Điền `Lĩnh vực`, `Mục tiêu`, `3 tầng độ sâu chuyên ngành`, `Phong cách ví dụ thực hành` và đổi trạng thái sang `ĐÃ KHỞI TẠO`.
-2. **Cá nhân hóa `GEMINI.md`:** Cập nhật vai trò Mentor và tên 3 tầng độ sâu (`🌱 / 💡 / 👑`) cùng loại ví dụ minh họa trong `GEMINI.md` cho khớp với chuyên ngành của người dùng, **đảm bảo phần từ `# SYSTEM INSTRUCTION` trở xuống luôn $\le 9.000$ ký tự**.
+2. **Cá nhân hóa `docs/notebooklm-system-prompt.md`:** Cập nhật vai trò Mentor, tên 3 tầng độ sâu (`🌱 / 💡 / 👑`) cùng loại ví dụ minh họa cho khớp chuyên ngành, **xác minh phần từ `# SYSTEM INSTRUCTION` trở xuống luôn $\le 8.350$ ký tự** bằng `study_helper.py check-prompt`.
 3. **Thiết kế `docs/roadmap.md`:** Xây dựng lộ trình học tập toàn diện chia làm 2 giai đoạn:
    - **Giai đoạn 1 — `🌱 CORE-TRUNK` (Nền tảng Cốt lõi):** Từ 3–6 học phần (Modules/Skills) gốc quan trọng nhất giúp nắm vững 80% bản chất và ứng dụng thực tế trong thời gian ngắn.
    - **Giai đoạn 2 — `🚀 TRACK-DEEP-DIVE` (Các Chuyên đề Chuyên sâu Track 1 → Track N):** Các nhánh chuyên môn sâu để nâng tầm lên mức Chuyên gia (`👑 Expert`).
 4. **Khởi tạo Cấu trúc `wiki/` 4 Tầng:**
    - Cập nhật `wiki/00-master-hub.md` khớp với `docs/roadmap.md`.
    - Tạo `wiki/00-core-trunk/00-hub-core-trunk.md` và các thư mục học phần con kèm trang `00-index-<hoc-phan>.md` (gồm Bảng Danh mục trống + Full Lộ trình Kiến thức của học phần đó).
-5. **Tạo ngay Lịch học Tuần 1 (`docs/lich-hoc-tuan-1.md`):**
-   - Thiết kế chi tiết từng buổi học của Tuần 1 theo đúng khuôn mẫu `docs/template-lich-hoc.md`.
-   - Mỗi buổi có sẵn khối **`Customize notebook` ($\le 1.400$ ký tự)** và danh sách **Tài liệu nguồn** (nếu là link web thì kiểm tra link sống `200 OK`; nếu người dùng dùng sách/PDF/giáo trình thì ghi rõ chương/mục cần nạp vào NotebookLM).
-6. **Hướng dẫn người dùng bắt đầu:** Chỉ dẫn ngắn gọn 3 bước để họ copy `GEMINI.md` vào NotebookLM và học ngay Buổi 1.
+5. **Tạo ngay Lịch học Tuần 1 (`docs/lich-hoc-tuan-1.md`, 5 ngày):**
+   - Thiết kế chi tiết từng buổi học của Tuần 1 theo đúng khuôn mẫu `docs/template-lich-hoc.md` (kích hoạt `weekly-study-plan`).
+   - Mỗi buổi có sẵn khối **`Lesson Scope` ($\le 1.400$ ký tự)** và danh sách **Nguồn tài liệu** (hỗ trợ đủ 4 loại: `url`/YouTube, file trong `sources/`, Google Drive, Text); chạy `study_helper.py check-week docs/lich-hoc-tuan-1.md` xác minh toàn bộ nguồn hợp lệ.
+6. **Bắt đầu học ngay trong Antigravity:** Gợi ý người dùng nhắn *"Tạo bài W1D1"* để khởi tạo notebook đầu tiên + chạy sẵn `/outline` hoàn toàn tự động qua MCP.
 
 ---
 
@@ -69,21 +73,24 @@ Wiki là **tài sản tri thức tích lũy**: kiến thức được biên so�
 ## 3. Cấu trúc Thư mục & Phân quyền
 
 ```text
-raw/           ← Bản gốc xuất từ NotebookLM (/export), được Agent kiểm chứng, bồi đắp cơ chế & đồng bộ 2 chiều (chứa cả Bộ Flashcards Tổng hợp)
+.agents/       ← Workspace Plugin Antigravity (`plugins/notebooklm-study/` chứa MCP đa nền tảng & 4 Skills tự động hóa)
+sources/       ← Tài liệu nguồn nội bộ (PDF/DOCX/PPTX/EPUB/Audio — gitignored) nạp trực tiếp vào NotebookLM qua MCP
+raw/           ← Bản gốc xuất từ NotebookLM (/export), tự kéo qua MCP, kiểm chứng, bồi đắp cơ chế & đồng bộ 2 chiều
 wiki/          ← Kho tri thức biên soạn theo cấu trúc 4 tầng (Agent đọc + ghi toàn quyền)
-docs/          ← Roadmap, Lịch học theo tuần, Template hướng dẫn (Cả hai quản lý)
+docs/          ← Roadmap, System Prompt NotebookLM (`docs/notebooklm-system-prompt.md`), Lịch học theo tuần & Template
 CLAUDE.md      ← Schema & Hiến pháp của Vault (Cả hai, sửa khi đồng ý hoặc khi chạy /init)
-GEMINI.md      ← System Instruction cho NotebookLM (Cập nhật khi /init)
 AGENTS.md      ← Liên kết điều hướng đến CLAUDE.md
 README.md      ← Hướng dẫn sử dụng cho người mới
 ```
 
 | Tầng | Vị trí | Chủ sở hữu | Quyền của Agent |
 |---|---|---|---|
+| Plugin & Skills | `.agents/plugins/notebooklm-study/` | Cả hai | Chạy health check MCP, lập lịch tuần, khởi tạo notebook đa nguồn, học qua MCP & đồng bộ Wiki |
+| Local Sources | `sources/` | Người dùng | Đọc & kiểm tra định dạng để nạp vào NotebookLM qua MCP `source_add(source_type="file")` |
 | Raw sources & Flashcards | `raw/` | Cả hai | **Đọc + Chuẩn hóa format + Bồi đắp cơ chế/ví dụ & Đồng bộ 2 chiều (cả thân bài lẫn Bộ Flashcards Tổng hợp) để luôn khớp 100% với `wiki/`.** |
 | Wiki | `wiki/` | Agent | Đọc + ghi toàn quyền |
 | Docs | `docs/` | Cả hai | Đọc + tạo lịch học + cập nhật trạng thái hoàn thành lịch học |
-| Schema | `CLAUDE.md`, `GEMINI.md` | Cả hai | Tự động cấu hình khi chạy `/init`; sau đó chỉ sửa khi người dùng đồng ý |
+| Schema & Prompt | `CLAUDE.md`, `docs/notebooklm-system-prompt.md` | Cả hai | Tự động cấu hình khi chạy `/init`; sau đó chỉ sửa khi người dùng đồng ý |
 
 ---
 
@@ -253,8 +260,7 @@ Khi chuẩn hóa raw files, áp dụng đầy đủ 4 nhóm quy tắc:
 6. **Kiểm soát Phạm vi:** Không tự ý đẻ thêm chuyên đề ngoài `docs/roadmap.md` khi chưa được đồng ý.
 7. **Chế độ Độ sâu Kép (`🌱 CORE-TRUNK` vs `🚀 TRACK-DEEP-DIVE`):** Ở giai đoạn Core Trunk, giữ vững trần độ sâu ở mức `🌱 Foundation & 💡 Practical`. Các nội dung vượt trần (`👑 Expert`) được gắn callout `> [!info] 🎒 Deep-Dive Backlog — Track X (...)` và đưa vào Bảng 2 của `00-index-*` để học sau.
 8. **Văn phong liền mạch, không lưu vết chắp vá (Seamless Documentation):** Khi cập nhật hoặc bổ sung nội dung vào `raw/`, `wiki/` hay `docs/`, **tuyệt đối không để lại các câu chữ mang tính ghi chú sửa đổi** (như *"Đã bổ sung..."*, *"Trước đây chưa giảng..."*, *"Cập nhật thêm..."*) bên trong nội dung bài viết. Mọi trang phải luôn đọc liền mạch như một cuốn sách hoàn chỉnh; lịch sử chỉnh sửa chỉ ghi vào `wiki/log.md`.
-9. **Giới hạn Ký tự Cứng của NotebookLM (`10.000` & `1.500` chars) & Nguồn Tài liệu Chuẩn:**
-   - Nội dung `GEMINI.md` (từ `# SYSTEM INSTRUCTION` trở xuống) bắt buộc **$\le 9.000$ ký tự** (giới hạn cứng của NotebookLM là `10.000` ký tự).
-   - Mỗi khối `Customize notebook` trong `docs/lich-hoc-tuan-X.md` bắt buộc **$\le 1.400$ ký tự** (giới hạn cứng của NotebookLM là `1.500` ký tự).
-   - Nếu nguồn tài liệu trong lịch học là URL trực tuyến, bắt buộc kiểm tra HTTP `200 OK` trước khi bàn giao; nếu là Sách/PDF/Giáo trình offline, ghi rõ tên tài liệu và Chương/Mục cần nạp.
+9. **Giới hạn Ký tự Cứng của NotebookLM (`Configure Chat <= 10.000` chars) & Xác minh Đa Nguồn:**
+   - Nội dung `docs/notebooklm-system-prompt.md` (từ `# SYSTEM INSTRUCTION` trở xuống) bắt buộc **$\le 8.350$ ký tự** và mỗi khối `Lesson Scope` trong `docs/lich-hoc-*.md` bắt buộc **$\le 1.400$ ký tự**, để khi Antigravity tự động ghép cả hai vào **Configure Chat** (`chat_configure`) luôn nằm gọn dưới trần `10.000` ký tự của NotebookLM.
+   - Mọi nguồn tài liệu trong `docs/lich-hoc-*.md` (gồm URL/YouTube trả HTTP `200 OK`, file nội bộ trong `sources/` thuộc 43 định dạng hỗ trợ, Google Drive hoặc Text) phải được xác minh bằng `.agents/plugins/notebooklm-study/scripts/study_helper.py check-week` trước khi bàn giao.
 10. **Tôn trọng Người học:** Nếu người dùng muốn điều chỉnh nhịp độ hay phong cách học, cập nhật ngay vào file này.
