@@ -50,6 +50,8 @@ When the user sends a study command or replies to NotebookLM's quiz:
 
 When the user finishes the final `/teach` item inside Antigravity and types `"kết bài"` (or `"chốt bài"`):
 
+> **Model & Context Tip (non-blocking):** Because Mode C runs full `/pre-ingest` fact-checking, 4-step Auto-Enrich, and 5-point `/ingest` across 5–8 files, if the user is on a lightweight model (such as `Gemini 3.8 Flash (Low / Medium)`) or after a long 10+ turn `/teach` thread, briefly note they can switch to **`Claude Sonnet 5.5 (Medium / High)`**, **`Gemini 4 Argon (Medium / High)`**, or **`Gemini 4 Neon (Medium / High)`** and optionally run `/compact` for best accuracy — proceed directly unless they choose to switch first.
+
 1. Check `chat_get(notebook_id=<notebook_id>)` to see which of `/flash-1`, `/flash-2`, `/export` have already been run in the latest session (avoid duplicate runs).
 2. Run any missing steps sequentially on NotebookLM using `notebook_query_start` + `notebook_query_status` (preserving `conversation_id`):
    - If `/flash-1` not yet run → send `"/flash-1"`.

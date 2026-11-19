@@ -176,6 +176,16 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 | **2** | **`study-day-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-day-init/SKILL.md) | `"Tạo bài W1D1"`, `"Tạo bài Track 1 W1D1"` | Kiểm tra nguồn hợp lệ → `notebook_create` → `source_add(wait=False)` cho đủ 4 loại nguồn (`url`/YouTube, `file` 43 định dạng, `drive`, `text`) → ghép `docs/notebooklm-system-prompt.md` + `Lesson Scope` vào `chat_configure` → **tự chạy `/outline`** → lưu trạng thái active notebook + in dàn bài & link. |
 | **3** | **`study-session-and-sync`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-session-and-sync/SKILL.md) | `"/teach"`, `"tiếp"`, `"kết bài"`, `"đồng bộ W1D1"` | Học tương tác `/teach`, trả lời câu hỏi, `/flash-1`, `/flash-2` trực tiếp trong Antigravity qua MCP (hiển thị nguyên văn, tự đồng bộ lên Web/Mobile); gõ **`kết bài`** tự chạy nối tiếp `/flash-1` → `/flash-2` → `/export` → `raw/` → `/pre-ingest` → `/ingest` (5-point sync) → `/lint`; gõ **`đồng bộ`** kéo `/export` từ buổi học trên Mobile/Web về Wiki. |
 
+### 🎯 Gợi ý Chọn Model theo Pha Công việc (Tối ưu Tốc độ & Quota)
+
+| Pha công việc / Skill | Độ nặng thực tế | Model & Phiên bản khuyến nghị | Ghi chú |
+|---|---|---|---|
+| **Setup & Học `/teach` qua MCP**<br/>(`study-init`, `study-day-init`, `/teach`, `tiếp`, `/flash-1`, `/flash-2`) | **Nhẹ** (chủ yếu gọi MCP & in nguyên văn từ NotebookLM) | **`Gemini 3.8 Flash (Low / Medium)`** *(hoặc `Claude Sonnet 5.5 (Low)`)* | Phản hồi nhanh nhất cho 10–15 lượt `/teach`, tiết kiệm quota tối đa vì NotebookLM là bên giảng bài. |
+| **Chốt bài & Ingest Wiki 5 điểm**<br/>(`"kết bài"`, `"đồng bộ"`, `/pre-ingest` → `/ingest` → `/lint`) | **Trung bình – Cao** (kiểm chứng nguồn, Auto-Enrich 4 bước, đồng bộ 5–8 file) | **`Claude Sonnet 5.5 (Medium / High)`**, **`Gemini 4 Argon (Medium / High)`** hoặc **`Gemini 4 Neon (Medium / High)`** | Tuân thủ chặt `CLAUDE.md`; nên chạy `/compact` trước nếu phiên `/teach` đã kéo dài nhiều lượt. |
+| **Khởi tạo `/init`, Lập lịch tuần & Kiến trúc**<br/>(`study-init` Clean Slate, `weekly-study-plan`, thiết kế `roadmap.md`) | **Cao** (thiết kế lộ trình đa tầng, quét chéo `backlog-*`, chọn nguồn chuẩn) | **`Claude Sonnet 5.5 (High)`** hoặc **`Gemini 4 Neon (High)`** *(chỉ cần `Claude Opus 5.5 (High)` / `Gemini 4 Neon (XHigh)` khi refactor lớn)* | Đảm bảo độ bao phủ kiến thức và cân đối độ sâu `CORE-TRUNK` vs `TRACK-DEEP-DIVE`. |
+
+> **Mẹo dùng 1 model duy nhất (không cần đổi qua lại):** Chọn **`Claude Sonnet 5.5 (Medium)`** hoặc **`Gemini 4 Argon (Medium)`** / **`Gemini 4 Neon (Medium)`** — đủ nhanh cho `/teach` và đủ chuẩn cho toàn bộ chuỗi `/ingest` Wiki. Agent cũng sẽ tự gợi ý ngắn 1 dòng ở các điểm chuyển pha quan trọng.
+
 ---
 
 ## 💡 Các Câu lệnh Ngắn gọn với AI Agent

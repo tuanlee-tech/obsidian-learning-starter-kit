@@ -10,6 +10,8 @@ description: >-
 
 Generate a complete, validated **5-day weekly study schedule** (`docs/lich-hoc-tuan-X.md` for Core Trunk or `docs/lich-hoc-track-T-tuan-W.md` for Track 1–N) that integrates seamlessly with `study-day-init` and NotebookLM MCP across any learning domain.
 
+> **Model Tier Tip:** Planning a 5-day schedule requires cross-checking `docs/roadmap.md`, `wiki/**/00-index-*.md` backlogs, depth ceilings, and strict char budgets — works best on **`Claude Sonnet 5.5 (High)`** or **`Gemini 4 Neon (High)`** (or **`Claude Opus 5.5 (High)`** / **`Gemini 4 Neon (XHigh)`** for major roadmap refactors). If the user is on a Flash/Low model, mention this briefly in 1 line without blocking execution.
+
 ## Inputs to Read First
 
 1. Read [CLAUDE.md](../../../../../CLAUDE.md) (especially §2, §5, and §12.7–12.9).

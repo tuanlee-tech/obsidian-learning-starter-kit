@@ -98,4 +98,4 @@ Execute these MCP calls in strict order:
    - Clickable link to the notebook: `https://notebook.google.com/notebook/<notebook_id>` (ready to continue on Web or Mobile too).
    - Brief confirmation: source breakdown ready + merged `Configure Chat` char count (`X / 10,000`).
    - **Verbatim `/outline` returned by NotebookLM (`result.answer`).**
-   - Short hint: *"Gõ `/teach` ngay tại đây để học trên Antigravity (tự đồng bộ lên NotebookLM), hoặc mở link trên điện thoại học rồi quay lại nhắn `đồng bộ`."*
+   - Short hint: *"Gõ `/teach` ngay tại đây để học trên Antigravity (tự đồng bộ lên NotebookLM — có thể hạ xuống `Gemini 3.8 Flash (Low / Medium)` hoặc `Claude Sonnet 5.5 (Low)` cho mượt và tiết kiệm quota), hoặc mở link trên điện thoại học rồi quay lại nhắn `đồng bộ`."*
