@@ -46,6 +46,11 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+import nlm_connect  # noqa: E402
+
 PLUGIN_DIR = SCRIPT_DIR.parent
 VAULT_ROOT = PLUGIN_DIR.parent.parent.parent
 PROMPT_FILE = VAULT_ROOT / "docs" / "notebooklm-system-prompt.md"
@@ -697,8 +702,11 @@ def _run_live_doctor(uvx_path: str) -> dict[str, Any]:
         return {"checked": True, "ok": False, "error": str(exc)}
 
 
-def cmd_check_env(args: argparse.Namespace) -> int:
-    system = platform.system()
+def _build_pc_check_env(
+    args: argparse.Namespace,
+    system: str,
+    prompt_check: dict[str, Any],
+) -> dict[str, Any]:
     uv_path = shutil.which("uv")
     uvx_path = shutil.which("uvx")
     auth_dir = Path.home() / ".notebooklm-mcp-cli"
@@ -708,26 +716,6 @@ def cmd_check_env(args: argparse.Namespace) -> int:
         or (auth_dir / "auth.json").exists()
     )
 
-    # Check system prompt budget
-    prompt_check: dict[str, Any]
-    try:
-        prompt_text = load_base_prompt()
-        prompt_check = {
-            "exists": True,
-            "chars": len(prompt_text),
-            "max_chars": MAX_BASE_PROMPT_CHARS,
-            "ok": len(prompt_text) <= MAX_BASE_PROMPT_CHARS,
-        }
-    except Exception as exc:  # noqa: BLE001
-        prompt_check = {"exists": False, "ok": False, "error": str(exc)}
-
-    # Check clean-slate vault state in CLAUDE.md
-    clean_slate = False
-    if CLAUDE_FILE.exists():
-        claude_text = read_text_normalized(CLAUDE_FILE)
-        clean_slate = "CHƯA KHỞI TẠO (CLEAN SLATE)" in claude_text
-
-    # Optional live nlm doctor check
     doctor: dict[str, Any] | None = None
     if args.live and uvx_path:
         doctor = _run_live_doctor(uvx_path)
@@ -755,23 +743,140 @@ def cmd_check_env(args: argparse.Namespace) -> int:
     if not args.live:
         next_steps.append(f"Verify auth health: {doctor_cmd}")
 
+    return {
+        "uv": uv_path,
+        "uvx": uvx_path,
+        "auth_dir": str(auth_dir),
+        "has_auth_profile": has_auth,
+        "doctor": doctor,
+        "ready": ready,
+        "next_steps": next_steps,
+        "android_mode": None,
+        "android_status": None,
+    }
+
+
+def _build_android_check_env(
+    args: argparse.Namespace,
+    prompt_check: dict[str, Any],
+) -> dict[str, Any]:
+    android_status = nlm_connect.detect_environment()
+    android_mode = android_status["mode"]
+    auth_dir = Path(android_status["auth_dir"])
+    has_auth = bool(android_status.get("has_auth_profile"))
+    uv_path = android_status.get("uv")
+    uvx_path = android_status.get("uvx")
+
+    doctor: dict[str, Any] | None = None
+    if args.live:
+        if android_mode == "remote":
+            doctor = nlm_connect.remote_endpoint_health(nlm_connect.load_android_mode(auth_dir))
+        else:
+            doctor = nlm_connect.live_cookie_health(auth_dir=auth_dir, update_metadata=True)
+
+    next_steps = list(android_status.get("next_steps") or [])
+    if android_mode == "remote":
+        live_ok = bool(doctor["ok"]) if doctor is not None else True
+        ready = bool(
+            android_status.get("runtime_shim_ok")
+            and android_status.get("remote_configured")
+            and live_ok
+            and prompt_check.get("ok")
+        )
+        if doctor is not None and not live_ok:
+            next_steps.append(
+                "Verify remote MCP endpoint (run /notebooklm-connect): python .agents/plugins/notebooklm-study/scripts/nlm_connect.py health --mode remote"
+            )
+    else:
+        auth_ok = bool(doctor["ok"]) if doctor is not None else bool(android_status.get("auth_ok"))
+        ready = bool(
+            android_status.get("debian_installed")
+            and android_status.get("debian_nlm_installed")
+            and android_status.get("runtime_shim_ok")
+            and auth_ok
+            and prompt_check.get("ok")
+        )
+        if doctor is not None and not doctor.get("ok") and not any("import-cookies" in s for s in next_steps):
+            next_steps.append(
+                'Refresh cookies via /notebooklm-connect: python .agents/plugins/notebooklm-study/scripts/nlm_connect.py import-cookies --file "/storage/emulated/0/Documents/cookies.txt" --delete-source'
+            )
+
+    if not prompt_check.get("ok"):
+        next_steps.append(
+            f"Fix docs/notebooklm-system-prompt.md (must exist and be <= {MAX_BASE_PROMPT_CHARS} chars from '# SYSTEM INSTRUCTION')"
+        )
+    if not args.live:
+        next_steps.append(
+            "Verify live health: python .agents/plugins/notebooklm-study/scripts/nlm_connect.py health"
+        )
+    if next_steps:
+        next_steps.append("Or run `/notebooklm-connect` for guided Android setup")
+
+    return {
+        "uv": uv_path,
+        "uvx": uvx_path,
+        "auth_dir": str(auth_dir),
+        "has_auth_profile": has_auth,
+        "doctor": doctor,
+        "ready": ready,
+        "next_steps": next_steps,
+        "android_mode": android_mode,
+        "android_status": android_status,
+    }
+
+
+def cmd_check_env(args: argparse.Namespace) -> int:
+    system = platform.system()
+    plat = nlm_connect.detect_platform()
+    is_android = plat == "android-agy"
+
+    # Check system prompt budget
+    prompt_check: dict[str, Any]
+    try:
+        prompt_text = load_base_prompt()
+        prompt_check = {
+            "exists": True,
+            "chars": len(prompt_text),
+            "max_chars": MAX_BASE_PROMPT_CHARS,
+            "ok": len(prompt_text) <= MAX_BASE_PROMPT_CHARS,
+        }
+    except Exception as exc:  # noqa: BLE001
+        prompt_check = {"exists": False, "ok": False, "error": str(exc)}
+
+    # Check clean-slate vault state in CLAUDE.md
+    clean_slate = False
+    if CLAUDE_FILE.exists():
+        claude_text = read_text_normalized(CLAUDE_FILE)
+        clean_slate = "CHƯA KHỞI TẠO (CLEAN SLATE)" in claude_text
+
+    env_details = (
+        _build_android_check_env(args, prompt_check)
+        if is_android
+        else _build_pc_check_env(args, system, prompt_check)
+    )
+    ready = bool(env_details["ready"])
+
     print(
         json.dumps(
             {
                 "os": system,
+                "platform": plat,
+                "is_android": is_android,
                 "python": platform.python_version(),
                 "vault_root": str(VAULT_ROOT),
                 "clean_slate": clean_slate,
                 "sources_dir_exists": SOURCES_DIR.exists(),
                 "active_session": STATE_FILE.exists(),
-                "uv": uv_path,
-                "uvx": uvx_path,
-                "auth_dir": str(auth_dir),
-                "has_auth_profile": has_auth,
+                "uv": env_details["uv"],
+                "uvx": env_details["uvx"],
+                "auth_dir": env_details["auth_dir"],
+                "has_auth_profile": env_details["has_auth_profile"],
+                "android_mode": env_details["android_mode"],
+                "android_status": env_details["android_status"],
                 "prompt_check": prompt_check,
-                "doctor": doctor,
+                "doctor": env_details["doctor"],
                 "ready": ready,
-                "next_steps": next_steps,
+                "next_steps": env_details["next_steps"],
             },
             ensure_ascii=False,
             indent=2,

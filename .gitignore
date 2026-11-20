@@ -21,3 +21,10 @@ __pycache__/
 # Local study source files (PDF/DOCX/PPTX/audio — keep folder structure only)
 sources/*
 !sources/.gitkeep
+
+# Defensive: never commit temporary NotebookLM cookies or local auth exports
+cookies.txt
+*cookies*.txt
+auth.json
+android-mode.json
+.notebooklm-mcp-cli/

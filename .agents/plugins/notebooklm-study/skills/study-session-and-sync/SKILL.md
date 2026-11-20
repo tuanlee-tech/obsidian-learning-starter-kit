@@ -19,7 +19,7 @@ Handles all interactive learning turns via NotebookLM MCP and one-command lesson
    ```bash
    python .agents/plugins/notebooklm-study/scripts/study_helper.py state-get
    ```
-2. If MCP tools are unavailable or return an auth error, invoke the **`study-init`** health check (`study_helper.py check-env --live`) first.
+2. If MCP tools are unavailable or return an auth error, invoke the **`notebooklm-connect`** skill (and **`study-init`** health check via `study_helper.py check-env --live`) first across Windows, macOS, Linux, or Android.
 3. If the user explicitly names another day/notebook or gives a NotebookLM URL (e.g. *"đồng bộ W2D1"*, *"học tiếp W2D2"*):
    - Extract the UUID from the URL or match via `notebook_list()` (by title / `W{X}D{Y}` / `Track ...`) and parse its schedule entry via `study_helper.py parse-day` to know the target `raw_file` and `schedule_file`.
    - Update `.state/active-notebook.json` with `state-set`.

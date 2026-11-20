@@ -1,8 +1,9 @@
 {
   "name": "notebooklm-study",
   "displayName": "NotebookLM Study Automation",
-  "description": "Workspace-scoped NotebookLM MCP and study workflow plugin for Obsidian vaults: MCP/auth health check & /init onboarding, 5-day weekly plans, multi-source daily notebooks (URL, YouTube, local PDF/DOCX/audio, Drive, text) with automatic /outline, interactive /teach via MCP, and one-command /export sync into a 4-tier wiki.",
+  "description": "Cross-platform (Windows / macOS / Linux / Android AGY) Workspace NotebookLM MCP and study workflow plugin for Obsidian vaults: automated MCP & auth setup (/notebooklm-connect), /init onboarding, 5-day weekly plans, multi-source daily notebooks (URL, YouTube, local PDF/DOCX/audio, Drive, text) with automatic /outline, interactive /teach via MCP, and one-command /export sync into a 4-tier wiki.",
   "suggestedPrompts": [
+    "Kết nối & cài đặt NotebookLM MCP đa nền tảng (/notebooklm-connect)",
     "Kiểm tra kết nối MCP & khởi tạo vault (/init)",
     "Tạo lịch học tuần mới từ roadmap (5 ngày)",
     "Tạo bài học hôm nay và chạy sẵn /outline"

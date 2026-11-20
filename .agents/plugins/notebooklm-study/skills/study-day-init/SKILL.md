@@ -43,7 +43,7 @@ If any source fails (broken URL or missing local file in `sources/`), stop and a
 
 ## Step 2: Ensure NotebookLM MCP & Auth Readiness
 
-If NotebookLM MCP tools (`notebook_create`, `source_add`, `chat_configure`, `notebook_query_start`) are missing or fail with authentication error (`UNAUTHENTICATED` / expired cookies), activate the **`study-init`** health-check workflow (`study_helper.py check-env --live`) to resolve `uv`/auth cleanly on Windows, macOS, or Linux.
+If NotebookLM MCP tools (`notebook_create`, `source_add`, `chat_configure`, `notebook_query_start`) are missing or fail with an authentication error (`UNAUTHENTICATED` / expired cookies), run `python .agents/plugins/notebooklm-study/scripts/study_helper.py check-env --live` and activate the **`notebooklm-connect`** skill (alongside `study-init` health check) to resolve `uv`, Android `proot`/remote shim, or auth cookies cleanly across Windows, macOS, Linux, and Android.
 
 ## Step 3: Create Notebook, Add All Sources & Configure Chat via MCP
 

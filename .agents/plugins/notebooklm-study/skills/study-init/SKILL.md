@@ -11,20 +11,20 @@ description: >-
 
 # Vault Init, NotebookLM MCP Health Check & Demand-Driven Scope Setup
 
-Run a full cross-platform health check of the NotebookLM MCP stack (Windows / macOS / Linux), auto-heal or guide any missing prerequisite in 1 step, and — if the vault is Clean Slate — execute the **Adaptive Discovery → 4-Mode Ground-Truth Anchor (JD / Syllabus / Spec) → Blueprint Approval Gate → Full Repo Scaffold** workflow from `CLAUDE.md` §0. On already-initialized vaults, safely stop after Health Check unless the user explicitly asks to run a non-destructive Re-Benchmark (Phase 3).
+Run a full cross-platform health check of the NotebookLM MCP stack (Windows / macOS / Linux / Android AGY), delegate or execute missing prerequisite setup cleanly via `notebooklm-connect` (`study_helper.py check-env --live` auto-detects Android and runs zero-dependency Cookie/CSRF or Remote endpoint checks without triggering native `uvx` Rust builds), and — if the vault is Clean Slate — execute the **Adaptive Discovery → 4-Mode Ground-Truth Anchor (JD / Syllabus / Spec) → Blueprint Approval Gate → Full Repo Scaffold** workflow from `CLAUDE.md` §0. On already-initialized vaults, safely stop after Health Check unless the user explicitly asks to run a non-destructive Re-Benchmark (Phase 3).
 
 ---
 
 ## Phase 1: Full Environment & Live MCP Health Check (Always Run First)
 
 1. **Local Environment, Auth Profile & Prompt Budget Check:**
-   Run the cross-platform helper (`python` on Windows or `python3` on macOS/Linux):
+   Run the cross-platform helper (`python` on Windows/Android or `python3` on macOS/Linux):
    ```bash
    python .agents/plugins/notebooklm-study/scripts/study_helper.py check-env --live
    ```
    Inspect:
-   - `uv` & `uvx` installed on `PATH`
-   - `doctor.version >= 0.16.5`, `doctor.cookies_count > 0`, `doctor.csrf_ok == true`, `doctor.account`
+   - On PC: `uv` & `uvx` installed on `PATH`, `doctor.version >= 0.16.5`
+   - On Android (`is_android == true`): `android_status` (`proot` Debian + smart `uvx` shim or `remote` endpoint), plus `doctor.ok == true` (`cookies_count >= 5` SSO keys & `csrf_ok == true`, or remote MCP probe OK)
    - `prompt_check.ok == true` (`docs/notebooklm-system-prompt.md <= 8,350` chars from `# SYSTEM INSTRUCTION`)
    - `sources_dir_exists == true`
    - `clean_slate`: `true` if `CLAUDE.md` still has `CHƯA KHỞI TẠO (CLEAN SLATE)`
@@ -48,12 +48,10 @@ Run a full cross-platform health check of the NotebookLM MCP stack (Windows / ma
 | Trạng thái Vault (`CLAUDE.md`) | ✅ Đã khởi tạo / ⏳ Clean Slate | Sẵn sàng học hoặc tiếp tục Phase 2 `/init` |
 
 4. **Auto-Remediation (If Anything is `❌`):**
-   - Missing `uv`: print/run the exact OS command returned in `next_steps` (`irm https://astral.sh/uv/install.ps1 | iex` on Windows; `curl -LsSf https://astral.sh/uv/install.sh | sh` on macOS/Linux).
-   - Expired or missing NotebookLM cookies: try MCP `refresh_auth()` first; if headless refresh fails, run:
-     ```bash
-     uvx --from "notebooklm-mcp-cli>=0.16.5" nlm login
-     ```
-   - Re-verify until all checks are `✅`.
+   - Delegate setup or repair cleanly to the **`notebooklm-connect`** skill (`python .agents/plugins/notebooklm-study/scripts/nlm_connect.py detect` & `health`):
+     - **On PC (Windows / macOS / Linux):** Install `uv` (`irm https://astral.sh/uv/install.ps1 | iex` on Windows; `curl -LsSf https://astral.sh/uv/install.sh | sh` on macOS/Linux), try MCP `refresh_auth()` or run `uvx --from "notebooklm-mcp-cli>=0.16.5" nlm login`.
+     - **On Android AGY (`is_android == true`):** Follow **`notebooklm-connect`** fast-path (`proot-distro` Debian + smart `uvx` shim or `remote` bridge + safe `import-cookies ... --delete-source`; never run native `uvx` or `pkg install nodejs-lts`/`rust`).
+   - Re-verify via `study_helper.py check-env --live` until all checks are `✅`.
 
 5. **Post-Health-Check Routing:**
    - If `clean_slate == false` and the user only requested `/init`, `"kiểm tra kết nối"`, or `"health check"` → report **✅ Vault đã khởi tạo và sẵn sàng học** and **STOP** (never overwrite an existing vault). Add a 1-line tip: *"Nếu muốn đối chiếu/mở rộng Roadmap theo JD hoặc chuẩn mới, nhắn: `Cập nhật Roadmap theo JD mới`."*

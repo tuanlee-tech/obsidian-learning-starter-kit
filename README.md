@@ -23,29 +23,41 @@ flowchart LR
 
 ---
 
-## 🚀 Cài đặt trên Máy mới (Windows / macOS / Linux — 2 Phút)
+## 🚀 Cài đặt trên Máy mới (Windows / macOS / Linux / Android — 2 Phút)
 
-Repo đã đóng gói sẵn **Workspace Plugin** tại [`.agents/plugins/notebooklm-study/`](.agents/plugins/notebooklm-study/) — tự tải đúng phiên bản `notebooklm-mcp-cli >= 0.16.5` qua `uvx`, chỉ kích hoạt riêng cho repo này và lưu cookie an toàn ngoài Git tại `~/.notebooklm-mcp-cli/`:
+Repo đã đóng gói sẵn **Workspace Plugin** tại [`.agents/plugins/notebooklm-study/`](.agents/plugins/notebooklm-study/) — giữ nguyên một file `mcp_config.json` duy nhất cho mọi hệ điều hành và lưu cookie an toàn ngoài Git tại `~/.notebooklm-mcp-cli/`:
 
-1. **Clone repo & cài `uv` (nếu máy chưa có):**
-   - **Windows (PowerShell):**
-     ```powershell
-     powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-     ```
-   - **macOS / Linux:**
+- **Trên PC (Windows / macOS / Linux):**
+  1. **Clone repo & cài `uv` (nếu máy chưa có):**
+     - **Windows (PowerShell):**
+       ```powershell
+       powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+       ```
+     - **macOS / Linux:**
+       ```bash
+       curl -LsSf https://astral.sh/uv/install.sh | sh
+       ```
+  2. **Đăng nhập Google NotebookLM 1 lần duy nhất:**
      ```bash
-     curl -LsSf https://astral.sh/uv/install.sh | sh
+     uvx --from "notebooklm-mcp-cli>=0.16.5" nlm login
      ```
-2. **Đăng nhập Google NotebookLM 1 lần duy nhất:**
-   ```bash
-   uvx --from "notebooklm-mcp-cli>=0.16.5" nlm login
-   ```
+
+- **Trên điện thoại Android (Antigravity for Android):**
+  Android dùng `Bionic libc` nên `uvx` bản gốc không tự biên dịch được `notebooklm-mcp-cli`. Chỉ cần mở repo này trong **Antigravity for Android** và nhắn:
+  ```text
+  /notebooklm-connect
+  ```
+  Skill `notebooklm-connect` tự cài đặt theo đúng máy của bạn **mà không sửa `mcp_config.json` trong Git**:
+  - **Mặc định (`proot` Debian):** Cài `proot-distro` + Debian + `uv` và shim `uvx` thông minh, giữ đủ **100% 10 MCP tools** (kể cả `chat_configure` & nạp PDF/Audio cục bộ trong `sources/`).
+  - **Chế độ nhẹ (`remote` MCP):** Kết nối qua bridge Python stdlib tới server trên PC/VPS (Tailscale / Streamable-HTTP), đổi chế độ bất kỳ lúc nào bằng 1 lệnh.
+  - **Nhập Cookie an toàn:** Hỗ trợ đồng bộ `auth.json` từ PC hoặc header `Cookie:` từ request `batchexecute` vào `~/.notebooklm-mcp-cli/` (`chmod 600`) rồi tự xóa file tạm.
+
 3. **Mở thư mục này bằng Obsidian** (để đọc Wiki) **và Antigravity**, rồi gõ đúng 1 lệnh:
    ```text
    /init
    ```
    Skill **`study-init`** sẽ tự động:
-   - **Chạy Health Check toàn diện** (`uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor`, ping sống MCP `server_info` + `notebook_list`, kiểm tra ngân sách ký tự `docs/notebooklm-system-prompt.md ≤ 8.350` ký tự).
+   - **Chạy Health Check toàn diện** (`uv`/`uvx` hoặc `proot`/remote shim trên Android, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor` / Cookie+CSRF HTTP probe, ping sống MCP `server_info` + `notebook_list`, kiểm tra ngân sách ký tự `docs/notebooklm-system-prompt.md ≤ 8.350` ký tự).
    - **Phỏng vấn thích ứng 2–3 lượt ngắn (5–8 câu tùy nhánh)** để định chuẩn phạm vi theo **4 chế độ Ground-Truth Anchor** (tự cung cấp JD/Đề cương/Spec, Agent Deep Search thực tế, Kết hợp Hybrid, hoặc Tự suy luận; hỗ trợ sinh sẵn Prompt Deep Research nếu muốn quét 50+ JD) + lọc kiến thức ĐÃ vững để không học lại.
    - **Trình bày Blueprint để bạn duyệt trước khi ghi file**, sau đó tự động dựng trọn bộ vault: `docs/scope-benchmark.md` (khi có JD/Syllabus/Deep Search), cập nhật [`CLAUDE.md`](CLAUDE.md), cá nhân hóa [`docs/notebooklm-system-prompt.md`](docs/notebooklm-system-prompt.md), dựng [`docs/roadmap.md`](docs/roadmap.md), khởi tạo [`wiki/00-master-hub.md`](wiki/00-master-hub.md) và tạo sẵn **Lịch học Tuần 1 (5 ngày)**.
 
@@ -127,12 +139,15 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 ## 📂 Cấu trúc Thư mục của Starter-Kit
 
 ```text
-├── .agents/plugins/notebooklm-study/  ← Workspace Plugin Antigravity (MCP đa nền tảng + 4 Skills)
+├── .agents/plugins/notebooklm-study/  ← Workspace Plugin Antigravity (MCP đa nền tảng PC + Android & 5 Skills)
 │   ├── plugin.json
-│   ├── mcp_config.json                ← Tự chạy uvx --from notebooklm-mcp-cli>=0.16.5 notebooklm-mcp
-│   ├── rules/AGENTS.md                ← Luật điều hướng /init, đa nguồn & active notebook
-│   ├── scripts/study_helper.py        ← Helper Python stdlib (health check, parser 4 loại nguồn, đếm ký tự)
+│   ├── mcp_config.json                ← Giữ nguyên uvx --from notebooklm-mcp-cli>=0.16.5 notebooklm-mcp cho mọi OS
+│   ├── rules/AGENTS.md                ← Luật điều hướng /notebooklm-connect, /init, đa nguồn & active notebook
+│   ├── scripts/
+│   │   ├── nlm_connect.py             ← Kết nối đa nền tảng (detect, health HTTP/Remote, import-cookies, shim proot/remote)
+│   │   └── study_helper.py            ← Helper Python stdlib (health check, parser 4 loại nguồn, đếm ký tự)
 │   └── skills/
+│       ├── notebooklm-connect/        ← Skill kết nối MCP PC/Android (`proot` Debian / `remote` bridge) & nhập Cookie an toàn
 │       ├── study-init/                ← Skill 0: Health Check MCP/NotebookLM, /init thích ứng (JD/Syllabus/Deep Search + Duyệt Blueprint) & Re-Benchmark
 │       ├── weekly-study-plan/         ← Skill 1: Tạo lịch học tuần (5 ngày)
 │       ├── study-day-init/            ← Skill 2: Tạo notebook đa nguồn + Configure Chat + chạy /outline
@@ -172,7 +187,8 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 
 | # | Tên Skill | File cấu hình | Cách gọi ngắn | Tự động thực hiện |
 |---|---|---|---|---|
-| **0** | **`study-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-init/SKILL.md) | `"/init"`, `"kiểm tra kết nối"`, `"cập nhật roadmap theo JD mới"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng (`uv`/`uvx`, `notebooklm-mcp-cli >= 0.16.5`, `nlm doctor`, ping sống `server_info` + `notebook_list`, kiểm tra độ dài prompt `≤ 8.350` chars); nếu vault Clean Slate thì phỏng vấn thích ứng 2–3 lượt, neo phạm vi theo **JD thực tế / Đề cương / Deep Search (4 chế độ)**, chốt duyệt Blueprint rồi dựng toàn bộ Roadmap, Hub và Tuần 1; hỗ trợ Re-Benchmark không phá hủy trên vault đã khởi tạo. |
+| **Connect** | **`notebooklm-connect`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/notebooklm-connect/SKILL.md) | `"/notebooklm-connect"`, `"kết nối notebooklm"`, `"cập nhật cookie"` | Cài đặt & chẩn đoán MCP NotebookLM đa nền tảng (Windows/macOS/Linux `uv`, Android `proot-distro` Debian + shim `uvx` hoặc `remote` HTTP bridge); nhập/làm mới Cookie (`auth.json` hoặc header `Cookie:` từ `batchexecute`) chuẩn `chmod 600` & tự xóa file tạm mà không sửa `mcp_config.json` trong Git. |
+| **0** | **`study-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-init/SKILL.md) | `"/init"`, `"kiểm tra kết nối"`, `"cập nhật roadmap theo JD mới"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng (`uv`/`uvx` hoặc Android `proot`/remote shim, kiểm tra độ dài prompt `≤ 8.350` chars, gọi `notebooklm-connect` nếu thiếu kết nối); nếu vault Clean Slate thì phỏng vấn thích ứng 2–3 lượt, neo phạm vi theo **JD thực tế / Đề cương / Deep Search (4 chế độ)**, chốt duyệt Blueprint rồi dựng toàn bộ Roadmap, Hub và Tuần 1; hỗ trợ Re-Benchmark không phá hủy trên vault đã khởi tạo. |
 | **1** | **`weekly-study-plan`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/weekly-study-plan/SKILL.md) | `"Tạo lịch học tuần X"` | Đọc `docs/roadmap.md`, quét bảng `backlog-*` trong `wiki/`, soạn lịch **5 ngày/tuần** (mỗi `Lesson Scope ≤ 1.400` chars) và xác minh toàn bộ nguồn (`url` `200 OK`, file trong `sources/`, `drive`, `text`) qua `study_helper.py check-week`. |
 | **2** | **`study-day-init`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-day-init/SKILL.md) | `"Tạo bài W1D1"`, `"Tạo bài Track 1 W1D1"` | Kiểm tra nguồn hợp lệ → `notebook_create` → `source_add(wait=False)` cho đủ 4 loại nguồn (`url`/YouTube, `file` 43 định dạng, `drive`, `text`) → ghép `docs/notebooklm-system-prompt.md` + `Lesson Scope` vào `chat_configure` → **tự chạy `/outline`** → lưu trạng thái active notebook + in dàn bài & link. |
 | **3** | **`study-session-and-sync`** | [`SKILL.md`](.agents/plugins/notebooklm-study/skills/study-session-and-sync/SKILL.md) | `"/teach"`, `"tiếp"`, `"kết bài"`, `"đồng bộ W1D1"` | Học tương tác `/teach`, trả lời câu hỏi, `/flash-1`, `/flash-2` trực tiếp trong Antigravity qua MCP (hiển thị nguyên văn, tự đồng bộ lên Web/Mobile); gõ **`kết bài`** tự chạy nối tiếp `/flash-1` → `/flash-2` → `/export` → `raw/` → `/pre-ingest` → `/ingest` (5-point sync) → `/lint`; gõ **`đồng bộ`** kéo `/export` từ buổi học trên Mobile/Web về Wiki. |
@@ -193,6 +209,7 @@ Nếu bạn dùng AI Agent khác ngoài Antigravity, chỉ cần thêm khối MC
 
 | Lệnh / Yêu cầu | Chức năng |
 |---|---|
+| `/notebooklm-connect` hoặc `"Cập nhật cookie"` | Cài đặt/khắc phục nhanh kết nối MCP NotebookLM trên PC & Android (`proot-distro` Debian / `remote` HTTP) và nạp `auth.json` / header `Cookie:` an toàn. |
 | `/init` hoặc `"Kiểm tra kết nối"` | Chạy **Health Check MCP/NotebookLM** đa nền tảng; nếu vault đang sạch thì phỏng vấn thích ứng 2–3 lượt, neo chuẩn theo **JD / Đề cương / Deep Search (4 chế độ)**, trình bày Blueprint duyệt rồi dựng toàn bộ Roadmap, Hub và Tuần 1. |
 | `"Cập nhật Roadmap theo JD mới"` | Chạy **Re-Benchmark không phá hủy** trên vault đã khởi tạo (đối chiếu JD/chuẩn mới, trình bày Diff đề xuất để duyệt — không xóa `wiki/` đã học). |
 | `"Tạo lịch học tuần X"` | Quét `docs/roadmap.md` & `backlog-*` trong `wiki/` để soạn lịch 5 ngày kèm kiểm chứng đa nguồn. |
