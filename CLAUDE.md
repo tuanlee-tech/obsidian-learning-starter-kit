@@ -195,7 +195,7 @@ Chạy **trước** khi ingest. Chỉ chuẩn hóa + kiểm chứng, KHÔNG tạ
    - Nếu phát hiện sai sót nghiêm trọng về bản chất sự thật → **DỪNG (`BLOCKED`), báo người dùng xác nhận trước khi ingest**.
 4. **Xử lý mục UNVERIFIED/GAP, Kiểm định Độ sâu 4 Bước (Auto-Enrich) & Chống Flashcards "mồ côi":**
    - Nếu có items trong `UNVERIFIED/GAP` → tra cứu xác minh, cập nhật vào bài và xóa mục GAP.
-   - **Kiểm định Độ sâu Tự động (4-Step Pedagogical Audit):** Quét toàn bộ các khái niệm/nguyên lý cốt lõi (nằm trong trần độ sâu của buổi học). Mỗi khái niệm bắt buộc phải có đủ 4 yếu tố: *(1) Định nghĩa & Ẩn dụ đời thường, (2) Vì sao tồn tại / Giải quyết bài toán gì, (3) Cơ chế / Quy trình hoạt động từng bước chi tiết (không chấp nhận tóm tắt lướt 1–2 câu kiểu hộp đen), và (4) Ví dụ thực tế (Case Study / Tình huống / Công thức / Code) hoặc Sơ đồ Mermaid minh họa*. Nếu mục nào bị NotebookLM tóm tắt quá sơ sài, Agent **tự động bồi đắp (Auto-Enrich)** đầy đủ vào cả thân bài `raw/`, `Bộ Flashcards Tổng hợp` trong `raw/` và các trang `wiki/`.
+   - **Kiểm định Độ sâu Tự động (4-Step Pedagogical Audit) & Trục Đánh đổi Cốt lõi:** Quét toàn bộ các khái niệm/nguyên lý cốt lõi (nằm trong trần độ sâu của buổi học). Mỗi khái niệm bắt buộc phải có đủ 4 yếu tố: *(1) Định nghĩa & Ẩn dụ đời thường, (2) Vì sao tồn tại / Giải quyết bài toán gì, (3) Cơ chế / Quy trình hoạt động từng bước chi tiết (không chấp nhận tóm tắt lướt 1–2 câu kiểu hộp đen), và (4) Ví dụ thực tế (Case Study / Tình huống / Công thức / Code) hoặc Sơ đồ Mermaid minh họa*. Khi giải thích hoặc định hướng lựa chọn công nghệ/phương pháp/giải pháp, bắt buộc áp dụng mô hình **"Trục Đánh đổi Cốt lõi" (First-Principle Trade-off Framework)** (§12.10). Nếu mục nào bị NotebookLM tóm tắt quá sơ sài hoặc chỉ đưa mẹo thuộc lòng theo Use-case, Agent **tự động bồi đắp (Auto-Enrich)** đầy đủ vào cả thân bài `raw/`, `Bộ Flashcards Tổng hợp` trong `raw/` và các trang `wiki/`.
    - **Kiểm tra & Đồng bộ 2 chiều Flashcards (Level 1 & Level 2):**
      - Chiều `Flashcards ➔ Thân bài`: Nếu có bất kỳ câu hỏi Q&A nào ở cuối file `raw/` mà phần thân bài bên trên chưa có lý thuyết giải thích đầy đủ, bắt buộc bổ sung lý thuyết đó vào thân bài `raw/` và `wiki/`.
      - Chiều `Thân bài ➔ Flashcards`: Khi Agent bồi đắp thêm cơ chế/ví dụ mới hoặc vá lỗ hổng kiến thức ở thân bài, bắt buộc **bổ sung/cập nhật ngay thẻ Flashcard Q&A tương ứng** vào mục `## 🃏 BỘ FLASHCARDS TỔNG HỢP` của file `raw/`.
@@ -215,7 +215,7 @@ Bất cứ khi nào **import một file `raw/` mới** HOẶC khi **người dù
 2. **Điểm 2 — Cập nhật `## 🃏 BỘ FLASHCARDS TỔNG HỢP` trong `raw/`:**
    - Tự động bổ sung hoặc nâng cấp các câu hỏi Q&A (`🌱 Foundation` & `💡 Practical`, cùng `👑 Expert` nếu có) khớp 100% với phần lý thuyết vừa import hoặc vừa vá thêm.
 3. **Điểm 3 — Tạo/Cập nhật các trang `wiki/` Mới & Đồng bộ ngược các trang `wiki/`, `raw/` Cũ liên quan:**
-   - Tạo hoặc cập nhật `source-<slug>.md`, `concept-<slug>.md`, `compare-<slug>.md`, `backlog-<slug>.md` trong `wiki/<track>/<hoc-phan>/` (kèm dòng Breadcrumb ở đầu bài; luôn escape `\|` cho các wikilink có alias nằm bên trong bảng Markdown).
+   - Tạo hoặc cập nhật `source-<slug>.md`, `concept-<slug>.md`, `compare-<slug>.md` (tuân thủ **First-Principle Trade-off Framework** §12.10), `backlog-<slug>.md` trong `wiki/<track>/<hoc-phan>/` (kèm dòng Breadcrumb ở đầu bài; luôn escape `\|` cho các wikilink có alias nằm bên trong bảng Markdown).
    - Quét các trang `wiki/` và `raw/` của những bài học trước đó có liên quan để gắn liên kết chéo 2 chiều và cập nhật đồng bộ nếu có kiến thức mở rộng/bổ trợ.
 4. **Điểm 4 — Đồng bộ Bảng Danh mục `00-index-<hoc-phan>.md` và Stage Hub `00-hub-<track>.md`:**
    - Cập nhật cột *Tóm tắt Nội dung Trọng tâm* ở **Bảng 1 (`concept/compare`)**, **Bảng 2 (`backlog`)**, **Bảng 3 (`source`)** và đánh dấu `[x]` tiến độ trong mục **Full Lộ trình Kiến thức** tại `00-index-<hoc-phan>.md` (cùng số liệu tiến độ tại `00-hub-<track>.md` và `00-master-hub.md`).
@@ -227,7 +227,7 @@ Bất cứ khi nào **import một file `raw/` mới** HOẶC khi **người dù
 
 ## 8. Quy trình Tra cứu & Hỏi đáp (`/query`)
 
-1. Đọc `00-master-hub.md` → `00-index-<hoc-phan>.md` → đọc các trang chi tiết liên quan → trả lời có đính kèm `[[wikilink]]`.
+1. Đọc `00-master-hub.md` → `00-index-<hoc-phan>.md` → đọc các trang chi tiết liên quan → trả lời có đính kèm `[[wikilink]]` (khi giải thích hoặc định hướng lựa chọn công nghệ/phương pháp/giải pháp, bắt buộc tuân thủ **First-Principle Trade-off Framework** §12.10).
 2. Nếu Wiki chưa có thông tin → nói rõ phần nào chưa học, đối chiếu `docs/roadmap.md` và gợi ý nguồn tài liệu.
 3. Nếu câu trả lời tổng hợp nhiều mảng kiến thức đáng giá → đề nghị lưu thành trang `synthesis-<slug>.md`.
 
@@ -269,7 +269,7 @@ Khi chuẩn hóa raw files, áp dụng đầy đủ 4 nhóm quy tắc:
 
 ---
 
-## 12. 10 Quy tắc Cứng (Golden Rules)
+## 12. 11 Quy tắc Cứng (Golden Rules)
 
 1. **Đồng bộ 2 chiều với `raw/` (Full Cascade Sync):** Không tự ý xóa file trong `raw/`. Mỗi khi import `raw/` mới hoặc khi vá/bồi đắp kiến thức trong `wiki/`, Agent **bắt buộc cập nhật đồng bộ cả phần thân bài lẫn `## 🃏 BỘ FLASHCARDS TỔNG HỢP` trong file `raw/` tương ứng** (cùng `00-index-*`, `00-hub-*` và `docs/lich-hoc-tuan-X.md`) theo đúng Chuỗi Đồng bộ Dây chuyền 5 Điểm (§7).
 2. **Không xóa trang `wiki/`** khi chưa hỏi ý kiến người dùng.
@@ -282,4 +282,11 @@ Khi chuẩn hóa raw files, áp dụng đầy đủ 4 nhóm quy tắc:
 9. **Giới hạn Ký tự Cứng của NotebookLM (`Configure Chat <= 10.000` chars) & Xác minh Đa Nguồn:**
    - Nội dung `docs/notebooklm-system-prompt.md` (từ `# SYSTEM INSTRUCTION` trở xuống) bắt buộc **$\le 8.350$ ký tự** và mỗi khối `Lesson Scope` trong `docs/lich-hoc-*.md` bắt buộc **$\le 1.400$ ký tự**, để khi Antigravity tự động ghép cả hai vào **Configure Chat** (`chat_configure`) luôn nằm gọn dưới trần `10.000` ký tự của NotebookLM.
    - Mọi nguồn tài liệu trong `docs/lich-hoc-*.md` (gồm URL/YouTube trả HTTP `200 OK`, file nội bộ trong `sources/` thuộc 43 định dạng hỗ trợ, Google Drive hoặc Text) phải được xác minh bằng `.agents/plugins/notebooklm-study/scripts/study_helper.py check-week` trước khi bàn giao.
-10. **Tôn trọng Người học:** Nếu người dùng muốn điều chỉnh nhịp độ hay phong cách học, cập nhật ngay vào file này.
+10. **Nguyên tắc Giảng dạy & Đào tạo Tư duy (Core Pedagogical Rule):** Khi giải thích hoặc định hướng tư duy lựa chọn công nghệ/phương pháp/giải pháp cho học viên, **BẮT BUỘC** tuân thủ mô hình **"Trục Đánh đổi Cốt lõi" (First-Principle Trade-off Framework)**:
+    1. **KHÔNG** đưa ra lời khuyên dạng thuộc lòng theo Use-case *(Ví dụ: "Làm Chat thì dùng A, làm Render thì dùng B")*.
+    2. **LUÔN BÓC TÁCH** bài toán về 2 Trục Căng thẳng: `[Giá trị / Nhu cầu Trải nghiệm]` VS `[Giới hạn / Chi phí Tài nguyên]`.
+    3. **LUÔN CUNG CẤP:**
+       - **1 Quy tắc Bỏ túi (The Golden Rule)** gói gọn bản chất trong 1 câu.
+       - **1 Bộ lọc 2 Câu hỏi Quyết định (Decision Tree)** để học viên tự suy luận.
+       - **1 Bảng Ma trận Đánh đổi (Trade-off Matrix)** minh họa "Được gì - Mất gì".
+11. **Tôn trọng Người học:** Nếu người dùng muốn điều chỉnh nhịp độ hay phong cách học, cập nhật ngay vào file này.
